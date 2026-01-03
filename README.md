@@ -1,3 +1,20 @@
+![3asekka OCR & Anti-Fraud Flow](3asekka_ocr_antifraud_flow_colored.png)
+---
+<br/><br/>
+<p align="center">
+  <img src="3asekka_ocr_antifraud_flow_colored.png" width="650" />
+</p>
+
+> **Visual overview of the OCR-based driver onboarding and anti-fraud validation flow.**
+> ## Anti-Fraud Rules (Examples)
+
+- IF national_id.name ≠ driving_license.name → Flag for manual review
+- IF plate_number not linked to driver → Reject registration
+- IF OCR quality < threshold → Request re-upload
+- IF any document belongs to a different identity → Block approval
+
+
+
 # 3asekka (ع السكة) — OCR & Anti-Fraud Case Study
 
 ## Overview
