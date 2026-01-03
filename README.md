@@ -1,5 +1,3 @@
-![3asekka OCR & Anti-Fraud Flow](3asekka_ocr_antifraud_flow_colored.png)
----
 <br/><br/>
 <p align="center">
   <img src="3asekka_ocr_antifraud_flow_colored.png" width="650" />
