@@ -12,10 +12,87 @@
 - IF any document belongs to a different identity → Block approval
 
 
+## Contents
+- [1) OCR & Anti-Fraud](#1-ocr--anti-fraud)
+- [2) Admin Dashboard](#2-admin-dashboard)
+- [3) Booking System](#3-booking-system)
+- [4) Payment Flow](#4-payment-flow)
+- [5) API + Mobile Flow](#5-api--mobile-flow)
+
+
 
 # 3asekka (ع السكة) — OCR & Anti-Fraud Case Study
 
 ## Overview
+
+---
+
+## 1) OCR & Anti-Fraud
+**What it covers**
+- OCR document scanning
+- Identity verification
+- Cross-document validation
+- Fraud detection rules
+
+**Used for**
+- KYC systems
+- Logistics & transportation apps
+- Fintech onboarding
+
+---
+
+## 2) Admin Dashboard
+**What it covers**
+- Admin review & moderation
+- Manual approve / reject
+- Status tracking
+- Audit logs
+
+**Used for**
+- Internal dashboards
+- Operations & support teams
+
+---
+
+## 3) Booking System
+**What it covers**
+- Booking lifecycle
+- Availability & assignment
+- Cancellation & rescheduling
+- Notifications
+
+**Used for**
+- Clinics
+- Cleaning services
+- Appointment-based apps
+
+---
+
+## 4) Payment Flow
+**What it covers**
+- Payment status handling
+- Validation & error handling
+- Refund logic
+- Fraud-aware checks
+
+**Used for**
+- Service platforms
+- Marketplaces
+- E-commerce systems
+
+---
+
+## 5) API + Mobile Flow
+**What it covers**
+- REST APIs
+- Mobile onboarding flow
+- State management
+- Error handling
+
+**Used for**
+- Flutter / mobile apps
+- Backend systems
+
 3asekka is a transportation and logistics platform in Egypt.
 This case study focuses on the driver onboarding and verification flow,
 specifically how OCR is used to extract data, validate documents, and prevent fraud
