@@ -1,772 +1,500 @@
-# 3ASEKKA (عالسكة)
-## Production On-Demand Goods Transportation Platform — Uber / Careem / inDrive Style for Logistics
+# 3ASEKKA — عالسكة
+## Production On-Demand Goods Transportation Platform
+### Uber / Careem / inDrive-style operating model for logistics and goods transport
 
-**3ASEKKA (عالسكة)** is a production **on-demand transportation and logistics application for moving goods**, built for the Egyptian market.
+> **VIEW-ONLY PORTFOLIO / CASE STUDY — NOT OPEN SOURCE**
+>
+> This public repository contains **documentation and reduced presentation visuals only**. It does **not** contain the production application source code, private backend code, credentials, API secrets, signing keys, database secrets, or private user data.
+>
+> **NO OPEN-SOURCE LICENSE IS GRANTED. ALL RIGHTS RESERVED.** See [`LICENSE`](LICENSE).
 
-Its operating model is closer to **Uber, Careem and inDrive** than to an e-commerce marketplace: a customer creates a transport request, chooses the required vehicle, selects pickup and drop-off points, receives a route-based suggested fare, drivers can submit competing offers, the customer chooses a driver, and the trip then moves through a real-time operational lifecycle until delivery is completed.
+**3ASEKKA (عالسكة)** is a production **on-demand goods transportation application** built for the Egyptian market. Its operating model is closer to **Uber, Careem and inDrive** than to an e-commerce marketplace: a customer creates a transport request, selects the required vehicle, chooses pickup and drop-off points, receives a route-based suggested price, drivers can submit competing offers, the customer selects a driver, and the trip proceeds through a real-time operational lifecycle until delivery is completed.
 
-The project was built as a full operational product — not just a set of mobile screens.
-
-> **Public case study only.** Production source code, private APIs, service credentials, signing keys and user data are intentionally not published here.
+The project is a full operational product — **customer flow + driver flow + owner/admin operations + monetization + AI-assisted verification + real-time infrastructure**.
 
 ---
 
-## Production stack
+## Visual proof
 
-- **Mobile:** React Native `0.81` + Expo SDK `54` + React `19`
-- **Backend / Database / Realtime:** Supabase — PostgreSQL, Auth, Realtime, Storage, RPCs and Edge Functions
-- **Maps & route pricing:** Google Maps / Google Routes
-- **OCR & Computer Vision:** Google Cloud Vision via a server-side Supabase Edge Function
-- **Push notifications:** Firebase Cloud Messaging (FCM)
-- **Location:** Expo Location + Google geocoding
-- **Voice / communication:** real-time chat, voice notes and configurable calling flows
-- **Android production identity:** `com.asekka.app`
+![3ASEKKA production UI — vehicle selection, order details, bidding, live tracking and customer home](showcase/3asekka_core_flow.jpg)
+
+The image above is a reduced public gallery created from **actual screenshots preserved in the production source archive**. High-resolution originals are kept private.
+
+### OCR / AI verification architecture
+
+![3ASEKKA OCR anti-manipulation flow](3asekka_ocr_antifraud_flow_colored.png)
+
+➡️ **More visuals and technical explanation:** [`SHOWCASE.md`](SHOWCASE.md)
+
+---
+
+# Production identity
+
+- **Android package:** `com.asekka.app`
 - **Production version:** `1.1.0`
 - **Android versionCode:** `20260815`
+- **Mobile:** React Native `0.81` + Expo SDK `54` + React `19`
+- **Backend / Database / Realtime:** Supabase — PostgreSQL, Auth, Realtime, Storage, RPCs and Edge Functions
+- **Maps / routing / route pricing:** Google Maps + Google Routes
+- **OCR / Computer Vision:** Google Cloud Vision through a server-side Supabase Edge Function
+- **Push notifications:** Firebase Cloud Messaging (FCM)
+- **Location:** Expo Location + Google geocoding
+
+A production Android release exists under the same package identity.
 
 ---
 
 # What was built
 
-## 1) Customer transportation flow
+## 1. Customer transport flow
 
-The customer can:
+The customer side supports a complete goods-transport journey:
 
 - Create an immediate transport request
-- Schedule a transport request for a later date/time
-- Select pickup and drop-off locations
-- Pick locations from interactive maps
-- Reuse saved addresses
+- Schedule a transport request for a future date/time
+- Select pickup and destination on interactive maps
 - Store pickup/drop-off coordinates
-- Add cargo description
-- Add estimated cargo weight
+- Reuse saved addresses
+- Add cargo description and estimated weight
 - Add pickup-floor information
-- Choose the required vehicle type
+- Choose the required vehicle class
 - Receive a server-calculated suggested fare
-- Adjust the offer without going below the server-approved minimum
+- Adjust the offer while respecting the backend minimum
 - Apply promo codes
 - Submit the request into the bidding flow
 - Receive driver offers in real time
-- Compare offers and driver information
-- Accept or reject individual bids
-- Chat with a driver
-- Use supported calling flows
+- Compare price, driver rating, completed trips and vehicle information
+- Accept or reject bids
+- Chat with the selected driver
+- Use supported calling / communication flows
 - Track the trip lifecycle in real time
 - Follow driver-location updates
-- Cancel with a server-calculated cancellation policy
+- Cancel through backend cancellation rules
 - Receive trip receipts / invoices
-- Open a dispute
-- Contact support
-- Repeat a previous completed order with its route/cargo details
-- View trip history and customer analytics
-- Receive in-app and push notifications
+- Open disputes and support tickets
+- Repeat a previous completed order
+- View history, analytics and notifications
 
 ---
 
-## 2) Four transportation vehicle classes
+## 2. Four goods-transport vehicle classes
 
-The application currently supports four goods-transport categories:
+The application supports four operational vehicle categories:
 
-| Vehicle | Intended capacity shown in the app |
+| Vehicle class | Intended capacity shown in the product |
 |---|---:|
-| **Quarter pickup / ربع نقل** | up to ~1.5 ton |
-| **Van / فان** | up to ~700 kg |
-| **Tricycle / تروسيكل** | up to ~300 kg |
-| **Motorbike / موتوسيكل** | up to ~50 kg |
+| Quarter pickup / ربع نقل | up to ~1.5 ton |
+| Van / فان | up to ~700 kg |
+| Tricycle / تروسيكل | up to ~300 kg |
+| Motorbike / موتوسيكل | up to ~50 kg |
 
-Vehicle type is not only visual UI. It is used in the order flow, driver eligibility and pricing configuration.
+Vehicle type is part of the **order rules, driver eligibility and pricing configuration**, not just a UI choice.
 
 ---
 
-# 3) Smart route-based pricing engine
+## 3. Smart route-based pricing engine
 
-One of the strongest parts of the system is the pricing architecture.
+Pricing is calculated server-side rather than relying on a simple hard-coded phone formula.
 
-The mobile app does **not** rely on a hard-coded local fare formula. Pricing is calculated by an authenticated server-side Edge Function.
+The fare architecture can use:
 
-The fare engine uses:
-
-- Real pickup coordinates
-- Real drop-off coordinates
-- **Google Routes traffic-aware road distance**
+- Pickup coordinates
+- Drop-off coordinates
+- Google Routes road distance
 - Estimated route duration
 - Toll information when available
 - Vehicle-specific pricing profiles
 - Admin-configured market pricing points
 - Minimum driver fare
 - Configurable platform commission
-- Configurable return factor
-- Configurable rounding step
+- Configurable pricing / return factors
+- Configurable rounding rules
 
-The backend calculates a **suggested customer fare and minimum allowed offer**.
-
-This creates an inDrive-like commercial model: the customer sees a realistic starting price and can raise the offer, while the backend prevents offers below the configured minimum.
-
-The bidding increment can also be configured by the admin.
+The backend returns a **suggested customer fare and minimum allowed offer**, supporting an inDrive-style commercial negotiation model while protecting configured minimum pricing.
 
 ---
 
-# 4) Real-time driver bidding
+## 4. Real-time driver bidding
 
-Drivers can receive eligible open transport requests and submit offers.
+Drivers can receive eligible open transport requests and submit competing offers.
 
-The bidding system includes:
+The bidding workflow includes:
 
-- Supabase Realtime bid subscriptions
+- Supabase Realtime subscriptions
 - Driver offer amount
-- Driver name
+- Driver identity / profile information
 - Rating
 - Completed-trip count
 - Vehicle information
-- Plate information when available
-- Customer accept action
-- Customer reject action
-- Closed / expired order protection
-- Backend RPC validation for accepting and rejecting bids
-- Configurable operational switch to stop bidding globally
-- Driver-level bidding restrictions when required by operations/debt rules
-
-This is a real transport-negotiation workflow, not a static quote screen.
+- Customer accept / reject actions
+- Expired / closed-order protection
+- Backend validation for accepting bids
+- Global operational bidding controls
+- Driver-level restrictions linked to operational / debt rules
 
 ---
 
-# 5) Scheduling / booking system
+## 5. Scheduling / booking
 
-Customers can create scheduled transport requests with:
+Customers can schedule transport for a later date and time with:
 
 - Date selection
 - Time selection
-- Cairo-time handling
 - Future-slot validation
-- Pickup and destination information
+- Pickup and destination details
 - Vehicle selection
-- Cargo information
+- Cargo details
 
-Scheduled jobs remain part of the normal order lifecycle and can later transition into active tracking.
+Scheduled requests continue into the normal operational lifecycle when activated.
 
 ---
 
-# 6) Full trip lifecycle
+## 6. Full trip lifecycle
 
-The project contains an operational state machine rather than a simple `pending/completed` flag.
+The platform uses a real operational state machine rather than a simple pending/completed flag.
 
-Supported lifecycle states include flows such as:
+Example lifecycle:
 
 `pending → bidding → active → driver_en_route → arrived_pickup → picked_up → arrived_dropoff → delivered → completed`
 
-with additional terminal states such as:
+with terminal states such as:
 
 - `cancelled`
 - `expired`
 
-The backend also stores **order status events**, enabling a real activity timeline and audit trail.
-
-Stale requests can be expired automatically through backend lifecycle rules.
+Order-status events provide an activity timeline / audit trail, and stale requests can be expired through backend lifecycle rules.
 
 ---
 
-# 7) Real-time maps & live trip tracking
+## 7. Live maps and trip tracking
 
-The tracking module includes:
+The tracking system includes:
 
 - Google Maps / React Native Maps
 - Pickup marker
 - Drop-off marker
-- Driver-location updates
-- Latest-known driver location
-- Supabase Realtime subscriptions
+- Latest driver location
+- Real-time driver-location updates
 - Route / distance presentation
 - Trip status timeline
-- ETA-oriented UI states
-- Driver-en-route state
+- Driver en-route state
 - Pickup-arrival state
 - Shipment-in-transit state
 - Drop-off-arrival state
 - Delivery completion state
-
-Location services also include Arabic reverse geocoding and Egypt geographic bounds validation.
-
----
-
-# 8) AI-assisted driver & document verification
-
-Driver onboarding uses a multi-step verification system powered by **Google Cloud Vision** through a secured server-side Edge Function.
-
-### Required capture types
-
-1. Profile photo
-2. Egyptian National ID — front
-3. Egyptian National ID — back
-4. Driving license
-5. Vehicle registration
-6. Vehicle photo / plate
-
-The AI credential is kept server-side and is never bundled into the mobile app.
+- Arabic reverse geocoding
+- Egypt geographic-bound validation
 
 ---
 
-## OCR and document intelligence
+# AI-assisted driver and document verification
 
-The system can use OCR results to extract or validate fields such as:
+Driver onboarding includes a multi-step OCR and computer-vision workflow powered by **Google Cloud Vision** from a secured server-side Edge Function.
+
+## Captures used in the onboarding workflow
+
+- Profile photo
+- Egyptian National ID — front
+- Egyptian National ID — back
+- Driving license
+- Vehicle registration
+- Vehicle photo / plate
+
+The Google Vision credential remains server-side and is not bundled into the public mobile presentation.
+
+## OCR / document intelligence
+
+The system can extract or validate data such as:
 
 - Egyptian national ID number
 - Document type
 - Expiry date
-- License-related data
+- License-related fields
 - Vehicle plate
-- Vehicle brand
-- Vehicle model
-- Vehicle color
-- Chassis number
-- Motor number
-- Vehicle type when readable
+- Vehicle brand / model / color when readable
+- Chassis / motor information when readable
+- OCR confidence and machine-verification metadata
 
-It also records OCR confidence and machine-verification metadata for admin review.
-
----
-
-## Computer Vision used in onboarding
+## Computer Vision
 
 ### Face Detection
-Used for profile-photo / identity capture validation, including detection of:
+Used to help identify cases such as:
 
-- No face
+- No detected face
 - Multiple faces
-- Low-confidence face detection
-- A document being submitted instead of a profile photo
+- Low-confidence face capture
+- A document submitted where a profile photo is expected
 
 ### Label Detection + Object Localization
-Used in vehicle-photo validation to help verify that the uploaded capture actually contains a vehicle.
+Used to help validate that a vehicle capture actually contains a vehicle.
 
 ### Document Text Detection
-Used for structured document OCR on identity and license documents.
+Used for structured OCR across identity and license documents.
 
 ---
 
-# 9) Cross-document anti-manipulation checks
+## Cross-document consistency / anti-manipulation checks
 
-The verification workflow goes beyond reading text.
+The verification system goes beyond text extraction.
 
-It performs consistency checks such as:
+Examples include:
 
-### National ID ↔ Driving License
-When the national ID number is readable from both documents, they must match.
+- **National ID ↔ Driving License:** identity consistency when the national ID number is readable in both
+- **Vehicle Registration ↔ Vehicle Photo:** plate / vehicle consistency when readable
+- **Correct-document checks:** helps detect a vehicle registration uploaded as a driving license or vice versa
+- **Duplicate-image fingerprint protection:** the exact same image cannot simply be reused across multiple required capture slots
+- **Expiry checks:** expired documents can be rejected when the expiry date is successfully extracted
+- **Confidence handling:** machine states such as `PASS`, `REVIEW` and `REJECT`
 
-### Vehicle Registration ↔ Vehicle Photo
-When the plate is readable from both captures, the plate numbers must match.
+### Real-world vehicle ownership rule
 
-### Correct-document checks
-The OCR layer detects obvious cases such as submitting a vehicle registration where a driving license is expected, or vice versa.
+The vehicle registration is **not required to be in the driver's own name**. The driver may legitimately operate a family-owned or otherwise permitted vehicle.
 
-### Duplicate-image protection
-Each capture has an image fingerprint. The same image cannot simply be reused in multiple required document slots.
+The correct relationships are therefore:
 
-### Expiry validation
-Expired documents can be rejected when the expiry date is successfully extracted.
+- National ID ↔ Driving License = **same driver**
+- Vehicle Registration ↔ Vehicle / plate = **same vehicle**
 
-### Confidence / review states
-The workflow supports machine decisions such as:
+This avoids a rigid rule that would incorrectly reject legitimate drivers.
 
-- `PASS`
-- `REVIEW`
-- `REJECT`
+### Human-in-the-loop approval
 
-Low-confidence or ambiguous captures are not silently trusted.
+AI is a verification layer, **not the final authority**.
 
----
+The admin retains the final ability to:
 
-## Important real-world vehicle rule
+- Approve
+- Reject
+- Request a specific capture again
 
-A vehicle registration **is not required to be in the driver's own name**.
+This combines automation with human operational control for sensitive onboarding decisions.
 
-A driver can legitimately operate a family-owned or otherwise permitted vehicle.
-
-Therefore the system verifies the correct relationships:
-
-- **National ID ↔ Driving License:** driver identity consistency
-- **Vehicle Registration ↔ Vehicle Photo:** vehicle / plate consistency
-
-It does **not** incorrectly force the vehicle owner name to equal the driver's name.
+> The system is correctly described as **AI-assisted identity and document verification**. It is not marketed as forensic Photoshop detection or “100% fraud-proof”.
 
 ---
 
-# 10) Human-in-the-loop admin approval
+# Driver operations
 
-AI is an automated verification layer — **not the final authority**.
+The driver side includes workflows for:
 
-The admin retains the final approval decision.
+- Registration and onboarding
+- Identity / vehicle document submission
+- Vehicle management
+- Online / offline availability
+- Eligible request discovery
+- Bid submission
+- Active-trip lifecycle
+- Completed-trip history
+- Earnings
+- Rating / performance information
+- Service-fee / commission obligations
+- Withdrawal requests
+- Notifications
+- Support and communication
 
-The admin review workflow can display:
-
-- Uploaded captures
-- OCR text state
-- OCR confidence
-- Verification decision
-- Validation reason
-- Vision features used
-- Document status
-- Driver verification state
-
-The admin can:
-
-- Approve the driver
-- Reject the driver
-- Request a specific photo/document to be retaken
-
-Sensitive verification state changes are protected at the backend level, not merely by hiding mobile buttons.
+Backend eligibility can consider verification state, vehicle type, availability, global platform controls and service-fee / debt rules.
 
 ---
 
-# 11) Driver availability & operational eligibility
+# Owner monetization / commission engine
 
-Drivers have an online/offline availability workflow.
+The product contains financial logic for the platform owner.
 
-The backend can restrict order access based on operational conditions such as:
-
-- Driver verification
-- Driver mode enabled
-- Vehicle availability
-- Vehicle type
-- Platform operational controls
-- Outstanding service-fee/debt rules
-
-Online presence is refreshed while the driver is active.
-
----
-
-# 12) Owner monetization / service-fee engine
-
-3ASEKKA includes an actual monetization architecture for the platform owner.
-
-When a trip is completed, the backend can create a **service-fee / commission settlement** containing:
+When a trip is completed, the backend can create a service-fee / commission settlement containing:
 
 - Gross trip value
 - Commission rate
 - Platform commission amount
 - Driver net amount
 - Settlement status
-- Settlement code
+- Settlement reference / code
 
-The commission is configurable from backend pricing settings rather than being permanently hard-coded.
+Commission is configurable through backend settings rather than permanently hard-coded.
 
-This means the product already contains the core financial logic required for a transport-platform owner to monetize completed trips.
+This gives the owner an operational monetization mechanism tied to completed transport activity.
 
 ---
 
-# 13) Driver service-fee settlement
+# Payments, wallet and financial operations
 
-The current production workflow supports manual service-fee settlement through:
+The project contains structured financial workflows, including:
 
-- **InstaPay**
-- **Vodafone Cash**
-- Receipt image upload
+- Driver service-fee settlement
+- InstaPay workflow
+- Vodafone Cash workflow
+- Receipt-image upload
 - Transfer-reference capture
-- Admin review
-- Paid / pending-review settlement states
-
-The database is also structured to support provider expansion. Paymob is represented as a future/disabled provider rather than being falsely presented as active production payment processing.
-
----
-
-# 14) Wallet, financial ledger & withdrawals
-
-The system includes:
-
+- Admin payment / receipt review
 - Wallet balance
 - Transaction ledger
-- Earnings records
 - Trip earnings
 - Service-fee obligations
-- Customer financial summary
 - Driver withdrawal requests
+- Vodafone Cash payout destination
+- InstaPay payout destination
+- Bank / IBAN payout details
+- Customer invoices / receipts
+- Paid / due amounts
+- Finance summaries
 
-Driver payout destinations include:
-
-- Vodafone Cash
-- InstaPay
-- Bank account / IBAN details
-
----
-
-# 15) Customer invoices & receipts
-
-Completed transport requests can produce customer trip receipts/invoices.
-
-The financial layer also supports:
-
-- Invoice number
-- Trip reference
-- Subtotal / total
-- Paid amount
-- Amount due
-- Payment method
-- Invoice status
-- Sharing the receipt
-- Customer finance summary
-
-The current trip settlement model can record the transport fare as **cash paid directly to the driver** while still maintaining a structured invoice/ledger in the platform.
+The current product should **not** be misrepresented as having every payment gateway live. The database / architecture is provider-extensible, while the active workflows are presented truthfully.
 
 ---
 
-# 16) Cancellation intelligence & debt handling
+# Cancellation and debt controls
 
-Cancellation is not a simple delete button.
+Cancellation is handled as an operational / financial process, not just a delete button.
 
-Before cancelling, the backend can calculate a cancellation quote based on the current trip state.
-
-The system supports:
+The backend can support:
 
 - Cancellation reasons
-- Movement fees after the driver has started moving
-- Separate handling for customer vs driver cancellation
-- Cancellation event audit
-- Customer cancellation invoices
-- Outstanding debt
-- Wallet payment of eligible customer debt
+- Stage-based movement fees
+- Separate customer / driver cancellation handling
+- Cancellation audit events
+- Cancellation invoices / debt
+- Wallet payment of eligible debt
 - Cancellation-frequency monitoring
-- Repeat cancellation risk
-- Customer/driver pair cancellation risk
+- Repeated-cancellation risk indicators
 - Configurable warning thresholds
-- Admin-configurable cancellation finance rules
 
----
-
-# 17) Driver debt controls
-
-The platform includes backend-controlled debt operations for drivers:
+Driver operations can also include:
 
 - Outstanding service-fee calculation
 - Debt warning
-- Debt block thresholds
-- Automatic bid restrictions
-- Admin driver-level bidding mode controls
-- Manual warning trigger
-
-These controls are enforced through backend logic, not only UI state.
+- Bid restrictions
+- Admin-controlled bidding modes
 
 ---
 
-# 18) Driver earnings, performance & gamification
+# Driver performance and retention
 
-Drivers have more than an order list.
-
-The project includes:
+Driver-facing systems include:
 
 - Earnings summary
 - Earnings details
 - Completed-trip statistics
 - Ratings
 - Bid history
-- Performance screen
-- Points system
-- Levels
-- Driver ranks
+- Performance screens
+- Points
+- Levels / ranks
 - Five-star bonus points
 - Cancellation penalties
-- Daily challenge target
+- Daily challenge targets
 - Admin-configurable gamification settings
 
-This helps support driver retention and operational incentives.
-
 ---
 
-# 19) Ratings & reviews
+# Communication and notifications
 
-The project contains a ratings system with backend aggregation.
+The project contains:
 
-It supports driver performance visibility in places such as:
-
-- Bid comparison
-- Driver profile
-- Driver ratings screen
-- Gamification / performance calculations
-
----
-
-# 20) Real-time chat + voice notes
-
-Customer/driver communication includes:
-
-- Real-time chat
-- Message delivery/read handling
+- Real-time customer / driver chat
+- Message delivery / read handling
 - Voice-note recording and sending
-- Participant rules tied to the order
-- Communication policy acceptance
-- Safety warnings before communication
-- Backend communication moderation/audit events
+- Calling-flow architecture
+- Communication policy / safety messaging
+- Backend communication audit / moderation hooks
+- In-app notifications
+- Firebase Cloud Messaging push notifications
 
-Phone visibility is also handled carefully around the pre-acceptance bidding stage.
-
----
-
-# 21) Calling architecture
-
-The codebase includes calling infrastructure and call-session screens, with backend operational controls that can enable/disable supported calling flows.
-
-The project also contains native call-related libraries and internal support-call flows.
-
-Calling is treated as an operationally controlled feature rather than an always-on hard-coded button.
+The product also has an audio-content architecture that can deliver configurable safety / terms audio. AI-generated voice assets can be produced externally and supplied through this content layer; the repository does not falsely claim that an ElevenLabs-style generator is embedded in the mobile source itself.
 
 ---
 
-# 22) Remote safety content + audio support
+# Admin / owner operations
 
-Safety rules and communication warnings are remotely configurable from the backend.
+The administrative system includes controls and workflows around areas such as:
 
-The configuration supports:
-
-- Enable / disable
-- Remote text
-- Versioning
-- Checkbox / button labels
-- Audio enable / disable
-- Audio URL
-- Transcript metadata
-- Voice metadata
-
-The mobile app can present the configured audio to users.
-
-**Accuracy note:** this proves a remote audio/voice delivery system. It does not claim that a specific AI voice generator such as ElevenLabs is embedded in the source code itself; AI-generated audio can be produced externally and published through this configuration.
-
----
-
-# 23) Notifications
-
-The project contains both realtime in-app notifications and FCM push infrastructure.
-
-Notification scenarios include areas such as:
-
-- New transport requests
-- Bid / order updates
-- Trip status changes
-- Driver verification / retake requests
-- Service-fee settlement
-- Support messages
-- Operational campaigns
-
-The admin dashboard can also send notification campaigns to selected audiences.
-
----
-
-# 24) Support center
-
-Users can open support tickets and communicate with support.
-
-The admin support center includes:
-
-- Ticket list
-- Ticket status
-- Conversation history
-- Admin replies
-- Ticket resolution / closure
-- Configurable support contact information
-- Realtime support updates
-
----
-
-# 25) Disputes
-
-The customer flow includes an order-dispute module, and the admin dashboard contains dispute review/resolution functionality.
-
-This is important for a real transportation operation where completion, payment or service disagreements may occur.
-
----
-
-# 26) Promo codes
-
-The customer order flow includes promo-code validation and stores financial values such as:
-
-- Original price
-- Discount amount
-- Final price after discount
-
----
-
-# 27) Saved addresses & repeat transport
-
-Customers can save commonly used addresses and mark a default address.
-
-Completed orders can also be repeated with previous information such as:
-
-- Vehicle type
-- Pickup location
-- Drop-off location
-- Coordinates
-- Cargo description
-- Estimated weight
-- Pickup floor
-
-This reduces friction for repeat business customers.
-
----
-
-# 28) Customer analytics
-
-The customer side includes analytics such as:
-
-- Completed / cancelled trip history
-- Recent trip history
-- Total paid for completed transports
-- Route and transaction history
-
----
-
-# 29) Filters
-
-The app contains filter workflows for customer and driver views, including combinations of:
-
-- Vehicle type
-- Price range
-- Scheduled jobs
-- Order status
-- Time period
-- Sorting by time / price
-
----
-
-# 30) Authentication & account security
-
-The authentication system includes multiple real flows:
-
-- Email registration/login
-- Phone registration/login
-- WhatsApp OTP flow
-- Google sign-in flow
-- Email verification
-- Forgot-password flow
-- Customer / driver account experiences
-- Controlled account-mode switching
-- App PIN setup / PIN unlock
-- Profile editing
-- Password change
-- Account deletion
-- Privacy policy
-- Terms and safety acceptance
-
-Sensitive role/verification/wallet changes are protected through backend rules.
-
----
-
-# 31) Admin operations dashboard
-
-The admin dashboard is a major part of the system and includes operational control over areas such as:
-
-- Orders
-- Bids
-- Driver documents
 - Driver verification
-- Retake requests
-- Withdrawals
-- Service-fee settlements
-- Commission payment receipts
-- Customer invoices
-- Cancellation finance
-- Cancellation risk
+- Document review
+- Final approve / reject decisions
+- Order controls
+- Bidding controls
+- Pricing configuration
+- Commission configuration
+- Driver debt / service-fee controls
+- Payment and receipt review
+- Cancellation operations
 - Disputes
 - Support tickets
 - Notification campaigns
-- Pricing
-- Commission
-- Bidding configuration
-- Driver debt controls
-- Driver gamification
-- Calls on/off
-- Customer orders on/off
-- Driver bidding on/off
-- Activity audit
-- Communication audit
+- Driver performance / gamification settings
+- Communication / calling controls
+- Activity / audit information
 
-Several of these switches are enforced server-side through Supabase RPCs / database policies rather than only being cosmetic dashboard toggles.
+Sensitive decisions are intended to be enforced through backend permissions and workflows, not only hidden UI buttons.
 
 ---
 
-# 32) Backend security & architecture
+# Authentication and platform infrastructure
 
-The project demonstrates production-oriented backend design including:
+The wider application architecture includes flows for areas such as:
 
-- Supabase Row Level Security
-- Authenticated RPCs
-- Admin-only RPCs
-- Server-side secrets
-- Edge Functions
-- Storage policies
-- Audit trails
+- Phone authentication
+- WhatsApp OTP flows
+- Email authentication / verification
+- Google Sign-In integration
+- Password recovery
+- App PIN / local access protection
+- Customer / driver mode handling
+- Supabase Auth
+- PostgreSQL database
+- Row Level Security policies
+- RPCs
 - Realtime subscriptions
-- Sensitive-field update guards
-- Production notification dispatch
-- Server-enforced pricing rules
-- Server-enforced bidding rules
-- Server-enforced operational switches
+- Storage policies
+- Edge Functions
+- Firebase / FCM notifications
+- Google Maps / Routes integrations
 
 ---
 
-# High-level architecture
+# Why this case study is valuable to clients
 
-```text
-React Native + Expo App
-        |
-        | Authenticated API / Realtime
-        v
-Supabase
-  ├─ Auth
-  ├─ PostgreSQL
-  ├─ Realtime
-  ├─ Storage
-  ├─ RPC / security rules
-  └─ Edge Functions
-        |
-        ├─ Google Cloud Vision (OCR / Face / Labels / Objects)
-        ├─ Google Routes / Maps
-        ├─ Firebase Cloud Messaging
-        └─ WhatsApp OTP integration
-```
+3ASEKKA demonstrates experience delivering an **end-to-end transport product**, not only designing screens.
+
+Relevant project types include:
+
+- Uber-like transport applications
+- Careem-like service applications
+- inDrive-style bidding applications
+- Goods / cargo transport systems
+- Last-mile / logistics applications
+- Driver / courier applications
+- Fleet / field-operations systems
+- KYC and driver-onboarding systems
+- OCR / document-verification applications
+- Real-time maps and tracking systems
+- Commission-based transport businesses
+- Operations-heavy mobile products
 
 ---
 
-# Why this case study is valuable to a client
+# Search tags / project keywords
 
-This project shows the ability to build a **revenue-ready operational transport platform**, including three separate product layers:
-
-### Customer product
-Request transport, negotiate price, schedule, track, communicate, receive receipts and manage problems.
-
-### Driver product
-Onboarding, AI-assisted verification, vehicle management, job feed, bidding, trip execution, earnings and payouts.
-
-### Owner / operations product
-Commission monetization, pricing, driver approval, financial review, debt enforcement, support, disputes, notifications and operational switches.
-
-A client looking to build an **Uber/Careem/inDrive-style transportation product, delivery platform, freight app, field-service dispatch system or driver onboarding system** can reuse the engineering patterns demonstrated here.
+#ReactNative #Expo #Supabase #PostgreSQL #GoogleCloudVision #OCR #ComputerVision #KYC #DocumentVerification #DriverVerification #LogisticsApp #TransportApp #GoodsTransport #OnDemandTransport #UberLike #CareemLike #InDriveLike #DriverApp #CourierApp #GoogleMaps #GoogleRoutes #Realtime #Firebase #FCM #MobileAppDevelopment #BiddingSystem #LiveTracking #DriverOnboarding #CommissionSystem #EgyptTech
 
 ---
 
-## AI positioning
+# Confidentiality, ownership and use restriction
 
-The technically correct positioning is:
+This public repository is deliberately limited to **portfolio documentation and reduced visuals**.
 
-> **AI-assisted driver and document verification using OCR, face detection, object/label detection, cross-document consistency checks, duplicate-image protection, confidence scoring and final human admin approval.**
-
-We do **not** falsely describe the current system as forensic Photoshop detection or “100% fraud-proof.”
-
----
-
-# Interested in building a similar platform?
-
-This case study represents experience across **React Native, Supabase, realtime systems, maps, logistics workflows, pricing engines, AI/OCR onboarding, financial operations and admin systems**.
-
-**GitHub:** [SAMA10000](https://github.com/SAMA10000)
-
----
-
-## Confidentiality
-
-This public repository intentionally excludes:
+It does **not** include:
 
 - Production source code
+- Private backend source
 - `.env` files
-- Supabase service-role credentials
-- Google Cloud Vision secrets
-- Firebase private credentials
-- Android signing keys
-- User identity documents
+- Supabase service-role secrets
+- Google Vision secrets
+- Private Firebase credentials
+- Android signing keystores
+- Database passwords
 - Customer / driver personal data
+
+**PROPRIETARY — ALL RIGHTS RESERVED.**
+
+Viewing for evaluation is permitted. No permission is granted to copy, modify, redistribute, deploy, reproduce, reverse engineer, commercially exploit, or create derivative products from the materials in this repository without prior written authorization from the project owner.
+
+This project is not affiliated with Uber, Careem or inDrive. Those names are used only to describe the general on-demand transport / bidding operating model for comparison.
