@@ -18,22 +18,47 @@ The gallery above is built from **actual project screenshots preserved in the pr
 
 The high-resolution originals are kept privately with the project owner. The public repository intentionally contains only a reduced presentation image so it cannot be used as a substitute for the application source.
 
-## OCR / AI verification
+## OCR / AI verification — actual camera flow
 
-![3ASEKKA OCR anti-manipulation flow](3asekka_ocr_antifraud_flow_colored.png)
+Driver onboarding is **camera-first**. Required identity and vehicle evidence is captured from the app camera; it is not described as a generic document-file upload flow.
 
-The production verification architecture documented from the source covers:
+```mermaid
+flowchart TD
+    A[Driver starts verification] --> B[Capture with in-app camera]
+    B --> C{Capture slot}
+    C -->|Profile photo| D[Face / visual validation]
+    C -->|National ID front/back| E[Document OCR + face detection]
+    C -->|Driving licence| F[Document OCR + document-type validation]
+    C -->|Vehicle registration| G[Document OCR + vehicle-field validation]
+    C -->|Vehicle photo| H[Vehicle object / label detection + plate text attempt]
+    D --> I[Business validation rules]
+    E --> I
+    F --> I
+    G --> I
+    H --> I
+    I --> J[Wrong-document / expiry / confidence checks]
+    J --> K[Cross-document consistency + duplicate-image protection]
+    K --> L{AI-assisted decision}
+    L -->|PASS| M[Ready for admin review]
+    L -->|REVIEW| N[Human review required]
+    L -->|REJECT| O[Retake capture]
+    M --> P[Admin final decision]
+    N --> P
+```
+
+The source-backed verification architecture covers:
 
 - Google Cloud Vision OCR
 - Arabic / English document text extraction
 - Face detection for profile / identity capture checks
 - Vehicle label / object detection
-- National ID ↔ driving-license consistency checks
+- Plate-like text attempt on vehicle capture when visible
+- National ID ↔ driving-licence consistency checks
 - Vehicle registration ↔ vehicle / plate consistency checks
 - Duplicate-image fingerprint protection
 - Expiry / wrong-document / low-confidence handling
-- PASS / REVIEW / REJECT machine states
-- Final human admin approval / rejection
+- `PASS` / `REVIEW` / `REJECT` machine states
+- Final human admin approval / rejection / retake decision
 
 **Important:** this is AI-assisted verification, not a claim of forensic Photoshop detection or 100% fraud-proofing.
 
