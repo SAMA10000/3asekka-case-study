@@ -14,6 +14,7 @@
 - **Admin / Owner Dashboard:** `https://3asekka.com/admin`
 - **Backend + database + realtime infrastructure** for operational workflows
 - **AI/OCR verification layer** for driver onboarding
+- **AI voice / policy-audio automation layer**
 - **Maps, route pricing, bidding, tracking, finance and communication systems**
 
 The native client is one React Native / Expo application with role-specific customer and driver flows rather than falsely presenting two unrelated mobile codebases.
@@ -22,7 +23,7 @@ The native client is one React Native / Expo application with role-specific cust
 
 ### Core technologies
 
-**React 19 · React Native 0.81.5 · Expo SDK 54 · TypeScript · React Native Web · Supabase · PostgreSQL · Realtime · Edge Functions · Google Maps · Google Routes · Google Cloud Vision OCR · Firebase/FCM · Agora · Android/Gradle · Nginx/HTTPS**
+**React 19 · React Native 0.81.5 · Expo SDK 54 · TypeScript · React Native Web · Supabase · PostgreSQL · Realtime · Edge Functions · Google Maps · Google Routes · Google Cloud Vision OCR · ElevenLabs TTS integration · Firebase/FCM · Agora · Android/Gradle · Nginx/HTTPS**
 
 ## Core production UI
 
@@ -82,9 +83,25 @@ The source-backed verification architecture covers:
 
 **Important:** this is AI-assisted verification, not a claim of forensic Photoshop detection or 100% fraud-proofing.
 
+## AI voice / safety-policy audio
+
+The production Supabase backend also contains a dedicated **AI voice generation workflow** for safety and communication policy audio.
+
+The deployed server-side flow can:
+
+- Read configurable safety / communication policy text from backend settings
+- Send the text to **ElevenLabs Text-to-Speech** using a server-side API credential
+- Use a configurable voice ID and model
+- Generate MP3 audio
+- Store/upsert generated audio in **Supabase Storage**
+- Save the resulting audio URL, transcript, voice metadata and model metadata back into platform settings
+- Keep generation behind authenticated **admin-only** control
+
+The policy-audio layer also supports pre-generated Egyptian voice assets. Existing platform configuration includes active audio URLs and an Egyptian voice label, so the case study distinguishes **AI voice capability/integration** from any unsupported claim about how every historical audio asset was produced.
+
 ## Search tags
 
-#React #ReactJS #ReactNative #Expo #TypeScript #ReactNativeWeb #Supabase #PostgreSQL #EdgeFunctions #GoogleCloudVision #OCR #ComputerVision #KYC #DocumentVerification #LogisticsApp #TransportApp #OnDemandTransport #UberLike #CareemLike #InDriveLike #DriverApp #AdminDashboard #CustomerPortal #WebDevelopment #GoogleMaps #GoogleRoutes #Realtime #Firebase #FCM #Agora #MobileAppDevelopment #AndroidDevelopment #EgyptTech #DriverOnboarding #BiddingSystem #LiveTracking #TransportSoftware
+#React #ReactJS #ReactNative #Expo #TypeScript #ReactNativeWeb #Supabase #PostgreSQL #EdgeFunctions #GoogleCloudVision #OCR #ComputerVision #KYC #DocumentVerification #ElevenLabs #TextToSpeech #AIVoice #LogisticsApp #TransportApp #OnDemandTransport #UberLike #CareemLike #InDriveLike #DriverApp #AdminDashboard #CustomerPortal #WebDevelopment #GoogleMaps #GoogleRoutes #Realtime #Firebase #FCM #Agora #MobileAppDevelopment #AndroidDevelopment #EgyptTech #DriverOnboarding #BiddingSystem #LiveTracking #TransportSoftware
 
 ---
 
