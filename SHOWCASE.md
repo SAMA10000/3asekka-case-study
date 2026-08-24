@@ -4,6 +4,26 @@
 >
 > This page contains no production source code, credentials, API secrets, signing material, private APIs, or private user data. **All rights reserved.**
 
+## Complete platform ecosystem
+
+3ASEKKA is a **full on-demand transport technology ecosystem**, not only a mobile UI project. The delivered product includes:
+
+- **Mobile application** with separate Customer and Driver experiences
+- **Public website:** `https://3asekka.com`
+- **Customer / Driver web portal:** `https://3asekka.com/portal`
+- **Admin / Owner Dashboard:** `https://3asekka.com/admin`
+- **Backend + database + realtime infrastructure** for operational workflows
+- **AI/OCR verification layer** for driver onboarding
+- **Maps, route pricing, bidding, tracking, finance and communication systems**
+
+The native client is one React Native / Expo application with role-specific customer and driver flows rather than falsely presenting two unrelated mobile codebases.
+
+➡️ **Full programming stack and architecture:** [`PLATFORM_AND_TECH_STACK.md`](PLATFORM_AND_TECH_STACK.md)
+
+### Core technologies
+
+**React 19 · React Native 0.81.5 · Expo SDK 54 · TypeScript · React Native Web · Supabase · PostgreSQL · Realtime · Edge Functions · Google Maps · Google Routes · Google Cloud Vision OCR · Firebase/FCM · Agora · Android/Gradle · Nginx/HTTPS**
+
 ## Core production UI
 
 ![3ASEKKA production UI — vehicle selection, order details, bidding, tracking and customer home](showcase/3asekka_core_flow.jpg)
@@ -64,7 +84,7 @@ The source-backed verification architecture covers:
 
 ## Search tags
 
-#ReactNative #Expo #Supabase #GoogleCloudVision #OCR #ComputerVision #KYC #DocumentVerification #LogisticsApp #TransportApp #OnDemandTransport #UberLike #CareemLike #InDriveLike #DriverApp #GoogleMaps #GoogleRoutes #Realtime #Firebase #FCM #MobileAppDevelopment #EgyptTech #DriverOnboarding #BiddingSystem #LiveTracking #TransportSoftware
+#React #ReactJS #ReactNative #Expo #TypeScript #ReactNativeWeb #Supabase #PostgreSQL #EdgeFunctions #GoogleCloudVision #OCR #ComputerVision #KYC #DocumentVerification #LogisticsApp #TransportApp #OnDemandTransport #UberLike #CareemLike #InDriveLike #DriverApp #AdminDashboard #CustomerPortal #WebDevelopment #GoogleMaps #GoogleRoutes #Realtime #Firebase #FCM #Agora #MobileAppDevelopment #AndroidDevelopment #EgyptTech #DriverOnboarding #BiddingSystem #LiveTracking #TransportSoftware
 
 ---
 
