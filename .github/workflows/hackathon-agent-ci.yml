@@ -1,0 +1,27 @@
+name: Hackathon Agent CI
+
+on:
+  push:
+    paths:
+      - "hackathon-agent/**"
+      - ".github/workflows/hackathon-agent-ci.yml"
+  pull_request:
+    paths:
+      - "hackathon-agent/**"
+      - ".github/workflows/hackathon-agent-ci.yml"
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hackathon-agent
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run deterministic evaluation
+        run: npm run eval
