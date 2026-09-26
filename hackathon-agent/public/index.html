@@ -275,6 +275,99 @@
       font-weight: 700;
     }
 
+    .bidding-card {
+      display: none;
+    }
+
+    .bidding-card.show {
+      display: block;
+    }
+
+    .bidding-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .timer {
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      background: var(--primary-soft);
+      border: 1px solid #FFD1B5;
+      border-radius: 999px;
+      padding: 6px 10px;
+    }
+
+    .offers-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .offer-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 13px;
+      background: #fff;
+      display: none;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      animation: offerIn .25s ease-out;
+    }
+
+    .offer-card.show { display: grid; }
+
+    @keyframes offerIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .offer-driver {
+      font-weight: 900;
+      margin-bottom: 5px;
+    }
+
+    .offer-meta {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .offer-price {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    .accept-btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-weight: 900;
+      cursor: pointer;
+      color: #fff;
+      background: var(--primary);
+    }
+
+    .accepted-box {
+      display: none;
+      margin-top: 12px;
+      border-radius: 15px;
+      padding: 13px;
+      background: var(--success-soft);
+      color: var(--success);
+      border: 1px solid #BBF7D0;
+      font-weight: 900;
+      line-height: 1.7;
+    }
+
+    .accepted-box.show { display: block; }
+
     .footer-note {
       text-align: center;
       color: #98A2B3;
@@ -334,6 +427,19 @@
         <div id="flow" class="flow"></div>
       </div>
 
+      <div id="biddingCard" class="card bidding-card">
+        <div class="bidding-head">
+          <h2 class="section-title" style="margin:0">
+            <span class="section-dot"></span>
+            <span id="biddingTitle">عروض السائقين</span>
+          </h2>
+          <span id="offerTimer" class="timer">00:15</span>
+        </div>
+        <p id="biddingHint" class="hint">بنستقبل عروض السائقين المناسبين لنقلتك...</p>
+        <div id="offersList" class="offers-list"></div>
+        <div id="acceptedBox" class="accepted-box"></div>
+      </div>
+
       <div class="footer-note" id="footerNote">عالسكة — نقل بضائع وحمولات بسهولة.</div>
     </section>
   </main>
@@ -382,6 +488,15 @@
         flowFare: "تقدير السعر",
         flowPrepare: "تجهيز النقلة",
         flowBids: "استقبال العروض",
+        biddingTitle: "عروض السائقين",
+        biddingHint: "بنستقبل عروض السائقين المناسبين لنقلتك...",
+        offerArrived: "وصل عرض جديد",
+        driver: "السائق",
+        rating: "التقييم",
+        trips: "رحلة مكتملة",
+        choose: "اختار العرض",
+        accepted: "✓ تم اختيار العرض. السائق",
+        acceptedTail: "تم حجزه لنقلتك.",
         footer: "عالسكة — نقل بضائع وحمولات بسهولة."
       },
       en: {
@@ -425,6 +540,15 @@
         flowFare: "Estimate fare",
         flowPrepare: "Prepare transport",
         flowBids: "Receive offers",
+        biddingTitle: "Driver Offers",
+        biddingHint: "Receiving offers from suitable drivers...",
+        offerArrived: "New offer received",
+        driver: "Driver",
+        rating: "Rating",
+        trips: "completed trips",
+        choose: "Choose offer",
+        accepted: "✓ Offer selected. Driver",
+        acceptedTail: "is booked for your transport.",
         footer: "3ASEKKA — goods transport made simple."
       }
     };
@@ -440,6 +564,10 @@
     const flow = el("flow");
     const statusBanner = el("statusBanner");
     const langBtn = el("langBtn");
+    const biddingCard = el("biddingCard");
+    const offersList = el("offersList");
+    const offerTimer = el("offerTimer");
+    const acceptedBox = el("acceptedBox");
     const isLocalServer = ["localhost", "127.0.0.1"].includes(location.hostname);
     let serverAvailable = isLocalServer;
     let lastData = null;
@@ -460,6 +588,8 @@
       voice.textContent = listening ? t("stop") : t("voice");
       voiceStatus.textContent = t("voiceIdle");
       el("summaryTitle").textContent = t("summaryTitle");
+      el("biddingTitle").textContent = t("biddingTitle");
+      el("biddingHint").textContent = t("biddingHint");
       el("footerNote").textContent = t("footer");
       if (recognition) recognition.lang = uiLang === "ar" ? "ar-EG" : "en-US";
       if (lastData) render(lastData);
@@ -501,6 +631,88 @@
       return [...new Set(keys)];
     }
 
+    let offerRevealTimers = [];
+    let countdownTimer = null;
+
+    function clearBiddingTimers() {
+      offerRevealTimers.forEach(clearTimeout);
+      offerRevealTimers = [];
+      if (countdownTimer) clearInterval(countdownTimer);
+      countdownTimer = null;
+    }
+
+    function chooseOffer(offer) {
+      acceptedBox.classList.add("show");
+      acceptedBox.textContent =
+        t("accepted") + " " + (offer.driverName || "—") + " — " + offer.amount + " EGP. " + t("acceptedTail");
+
+      offersList.querySelectorAll(".accept-btn").forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = ".5";
+      });
+    }
+
+    function startBidding(offers = []) {
+      clearBiddingTimers();
+      acceptedBox.classList.remove("show");
+      acceptedBox.textContent = "";
+      offersList.replaceChildren();
+
+      if (!offers.length) {
+        biddingCard.classList.remove("show");
+        return;
+      }
+
+      biddingCard.classList.add("show");
+      let remaining = 15;
+      offerTimer.textContent = "00:" + String(remaining).padStart(2, "0");
+      countdownTimer = setInterval(() => {
+        remaining = Math.max(0, remaining - 1);
+        offerTimer.textContent = "00:" + String(remaining).padStart(2, "0");
+        if (remaining === 0) {
+          clearInterval(countdownTimer);
+          countdownTimer = null;
+        }
+      }, 1000);
+
+      offers.forEach((offer, index) => {
+        const card = document.createElement("div");
+        card.className = "offer-card";
+
+        const left = document.createElement("div");
+        const driver = document.createElement("div");
+        driver.className = "offer-driver";
+        driver.textContent = t("driver") + ": " + (offer.driverName || ("#" + (index + 1)));
+
+        const meta = document.createElement("div");
+        meta.className = "offer-meta";
+        meta.textContent =
+          t("rating") + ": " + (offer.rating ?? "—") + " ★ · " +
+          (offer.completedTrips ?? "—") + " " + t("trips");
+
+        left.append(driver, meta);
+
+        const right = document.createElement("div");
+        const price = document.createElement("div");
+        price.className = "offer-price";
+        price.textContent = offer.amount + " EGP";
+
+        const button = document.createElement("button");
+        button.className = "accept-btn";
+        button.textContent = t("choose");
+        button.addEventListener("click", () => chooseOffer(offer));
+
+        right.append(price, button);
+        card.append(left, right);
+        offersList.appendChild(card);
+
+        offerRevealTimers.push(setTimeout(() => {
+          card.classList.add("show");
+          el("biddingHint").textContent = t("offerArrived") + " " + (index + 1) + "/" + offers.length;
+        }, 900 + index * 1200));
+      });
+    }
+
     function render(data) {
       lastData = data;
       resultCard.classList.add("show");
@@ -529,6 +741,7 @@
         flow.appendChild(chip);
       }
 
+      startBidding(data.offers || []);
       resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
