@@ -43,6 +43,7 @@
       background: #111827;
       color: #fff;
     }
+    button:disabled { opacity: .55; cursor: wait; }
     pre {
       direction: ltr;
       text-align: left;
@@ -95,8 +96,8 @@
       <h1>3ASEKKA AI Transport Agent</h1>
       <p class="muted">
         وكيل تشغيل لنقل البضائع: يفهم طلب النقل العربي، يجمع الناقص، يقترح المركبة،
-        يجهّز طلب النقل ويقرر الخطوة التشغيلية التالية. عند ضبط مفتاح AI يعمل
-        باستخراج ذكي + أدوات تشغيل؛ وبدون مفتاح يتحول تلقائيًا إلى وضع آمن تجريبي.
+        يجهّز طلب النقل ويقرر الخطوة التشغيلية التالية. نسخة السيرفر تدعم AI حقيقي
+        عند ضبط المفتاح؛ ونسخة GitHub Pages تستخدم fallback آمنًا لعرض تدفق التشغيل بدون أسرار.
       </p>
 
       <p class="example" id="example">
@@ -121,6 +122,7 @@
     </div>
   </main>
 
+  <script src="./browser-fallback.js"></script>
   <script>
     const input = document.getElementById("input");
     const output = document.getElementById("output");
@@ -129,6 +131,7 @@
     const summary = document.getElementById("summary");
     const actions = document.getElementById("actions");
     const aiStatus = document.getElementById("aiStatus");
+    let serverAvailable = true;
 
     example.addEventListener("click", () => {
       input.value = example.textContent.trim();
@@ -173,18 +176,20 @@
       output.textContent = JSON.stringify(data, null, 2);
       aiStatus.textContent = data.agent?.aiEnabled
         ? "AI ON — " + data.agent.provider + (data.agent.model ? " / " + data.agent.model : "")
-        : "Safe fallback — AI key not configured";
+        : (serverAvailable ? "Safe fallback — AI key not configured" : "GitHub Pages — safe public fallback");
     }
 
     async function loadStatus() {
       try {
-        const response = await fetch("/api/status");
+        const response = await fetch("./api/status", { cache: "no-store" });
+        if (!response.ok) throw new Error("No server API");
         const data = await response.json();
         aiStatus.textContent = data.ai?.configured
           ? "AI configured — " + data.ai.provider
           : "Safe fallback — AI key not configured";
       } catch {
-        aiStatus.textContent = "Demo status unavailable";
+        serverAvailable = false;
+        aiStatus.textContent = "GitHub Pages — safe public fallback";
       }
     }
 
@@ -192,15 +197,26 @@
       output.textContent = "جارٍ التحليل واتخاذ القرار...";
       run.disabled = true;
       try {
-        const response = await fetch("/api/agent", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ input: input.value })
-        });
-        const data = await response.json();
+        let data;
+        if (serverAvailable) {
+          const response = await fetch("./api/agent", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ input: input.value })
+          });
+          if (!response.ok) throw new Error("Server API unavailable");
+          data = await response.json();
+        } else {
+          data = window.run3AsekkaBrowserFallback(input.value);
+        }
         render(data);
       } catch (error) {
-        output.textContent = String(error);
+        serverAvailable = false;
+        try {
+          render(window.run3AsekkaBrowserFallback(input.value));
+        } catch (fallbackError) {
+          output.textContent = String(fallbackError || error);
+        }
       } finally {
         run.disabled = false;
       }
