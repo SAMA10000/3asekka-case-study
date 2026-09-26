@@ -3,12 +3,16 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { runTransportAgent } from "./agent.mjs";
+import { getAIConfiguration } from "./llm.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const port = Number(process.env.PORT ?? 3000);
 
 function sendJson(res, status, body) {
-  res.writeHead(status, { "content-type": "application/json; charset=utf-8" });
+  res.writeHead(status, {
+    "content-type": "application/json; charset=utf-8",
+    "cache-control": "no-store"
+  });
   res.end(JSON.stringify(body, null, 2));
 }
 
@@ -17,6 +21,15 @@ const server = http.createServer(async (req, res) => {
     const html = await readFile(path.join(__dirname, "public", "index.html"), "utf8");
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     res.end(html);
+    return;
+  }
+
+  if (req.method === "GET" && req.url === "/api/status") {
+    sendJson(res, 200, {
+      ok: true,
+      agent: "3ASEKKA AI Transport Agent",
+      ai: getAIConfiguration()
+    });
     return;
   }
 
@@ -33,7 +46,8 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
-      sendJson(res, 200, runTransportAgent(input));
+      const result = await runTransportAgent(input);
+      sendJson(res, 200, result);
     } catch (error) {
       sendJson(res, 400, { error: "invalid request", details: String(error) });
     }
@@ -41,7 +55,11 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (req.method === "GET" && req.url === "/health") {
-    sendJson(res, 200, { ok: true, agent: "3ASEKKA AI Transport Agent" });
+    sendJson(res, 200, {
+      ok: true,
+      agent: "3ASEKKA AI Transport Agent",
+      ai: getAIConfiguration()
+    });
     return;
   }
 
