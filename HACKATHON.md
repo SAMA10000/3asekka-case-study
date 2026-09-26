@@ -1,35 +1,41 @@
 # 3ASEKKA AI Transport Agent — Agents at Work 2026
 
-This is the public hackathon entry point for **3ASEKKA (عالسكة)**.
+Public hackathon entry point for **3ASEKKA (عالسكة)**.
 
-## What it is
+## One-line pitch
 
-**3ASEKKA AI Transport Agent** converts a natural Arabic goods-transport request into a structured local transport job.
+**An Arabic AI operations agent that converts a simple goods-transport request into an actionable local transport job, then orchestrates vehicle selection, routing, fare estimation and driver-matching stages.**
 
-Example:
+## Example
 
-> عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3 ووزنهم حوالي 250 كيلو
+> عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو
 
 The agent can:
 
-1. Extract pickup, destination, cargo, weight, requested time and distance when provided.
-2. Ask only for information that is still missing.
-3. Recommend a suitable vehicle class.
-4. Produce a demo fare estimate.
-5. Turn the conversation into a structured transport request.
-6. Prepare the request for driver matching / bidding.
-7. Present safe simulated offers in the public demo while production integrations remain private.
+1. Understand a natural Arabic transport request.
+2. Extract pickup, destination, cargo, weight and requested time.
+3. Ask only for information that is actually missing.
+4. Recommend a suitable vehicle class.
+5. Decide whether route calculation is required next.
+6. Produce a demo fare when route distance is available.
+7. Prepare a structured transport request for driver matching/bidding.
 
-## Why this is different from a chatbot
+## AI design
 
-The agent does not stop at answering a message. It converts unstructured Arabic into **transport operations** and makes operational decisions.
+Natural-language extraction can run through a configured Gemini, OpenAI or OpenAI-compatible model. The LLM is deliberately separated from business tools: vehicle limits, pricing and workflow decisions remain deterministic and inspectable.
 
-## Important public-demo boundary
+If no AI key is configured, the public demo safely falls back to an Arabic parser rather than failing.
 
-This repository intentionally does **not** contain the production mobile application, private Supabase schema, credentials, user data, signing keys, production pricing configuration, or private business logic.
+## Why this is not a customer-support chatbot
 
-The hackathon demo is isolated under:
+The output is not merely a reply. The agent creates a transport operation and emits an action trace showing which operational tool/stage should run next.
+
+## Public-demo boundary
+
+Production 3ASEKKA source code, Supabase secrets, user data, private schema, signing keys and production business logic remain private.
+
+The isolated hackathon implementation is here:
 
 **[hackathon-agent/](hackathon-agent/README.md)**
 
-The wider 3ASEKKA production case study remains documented in the repository root.
+The wider production case study remains documented in the repository root.
