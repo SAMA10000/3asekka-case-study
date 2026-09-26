@@ -131,7 +131,8 @@
     const summary = document.getElementById("summary");
     const actions = document.getElementById("actions");
     const aiStatus = document.getElementById("aiStatus");
-    let serverAvailable = true;
+    const isLocalServer = ["localhost", "127.0.0.1"].includes(location.hostname);
+    let serverAvailable = isLocalServer;
 
     example.addEventListener("click", () => {
       input.value = example.textContent.trim();
@@ -181,15 +182,20 @@
 
     async function loadStatus() {
       try {
-        const response = await fetch("./api/status", { cache: "no-store" });
+        const response = await fetch("/api/status", { cache: "no-store" });
         if (!response.ok) throw new Error("No server API");
         const data = await response.json();
         aiStatus.textContent = data.ai?.configured
           ? "AI configured — " + data.ai.provider
           : "Safe fallback — AI key not configured";
       } catch {
-        serverAvailable = false;
-        aiStatus.textContent = "GitHub Pages — safe public fallback";
+        if (isLocalServer) {
+          serverAvailable = true;
+          aiStatus.textContent = "Local server detected — status endpoint failed";
+        } else {
+          serverAvailable = false;
+          aiStatus.textContent = "GitHub Pages — safe public fallback";
+        }
       }
     }
 
@@ -199,7 +205,7 @@
       try {
         let data;
         if (serverAvailable) {
-          const response = await fetch("./api/agent", {
+          const response = await fetch("/api/agent", {
             method: "POST",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ input: input.value })
@@ -211,11 +217,16 @@
         }
         render(data);
       } catch (error) {
-        serverAvailable = false;
-        try {
-          render(window.run3AsekkaBrowserFallback(input.value));
-        } catch (fallbackError) {
-          output.textContent = String(fallbackError || error);
+        if (isLocalServer) {
+          output.textContent = "Server/API error: " + String(error) + "\n\nOpen http://localhost:3000/api/ai-test to see the Gemini diagnostic.";
+          aiStatus.textContent = "Local server error — diagnostic needed";
+        } else {
+          serverAvailable = false;
+          try {
+            render(window.run3AsekkaBrowserFallback(input.value));
+          } catch (fallbackError) {
+            output.textContent = String(fallbackError || error);
+          }
         }
       } finally {
         run.disabled = false;
