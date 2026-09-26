@@ -12,15 +12,16 @@
       background: #f5f7fb;
       color: #151515;
     }
-    main { max-width: 900px; margin: 48px auto; padding: 20px; }
+    main { max-width: 980px; margin: 36px auto; padding: 20px; }
     .card {
       background: white;
       border: 1px solid #e4e7ee;
       border-radius: 18px;
       padding: 24px;
       box-shadow: 0 10px 30px rgba(0,0,0,.05);
+      margin-bottom: 16px;
     }
-    h1 { margin-top: 0; }
+    h1, h2 { margin-top: 0; }
     .muted { color: #667085; line-height: 1.8; }
     textarea {
       width: 100%;
@@ -39,6 +40,8 @@
       font: inherit;
       font-weight: 700;
       cursor: pointer;
+      background: #111827;
+      color: #fff;
     }
     pre {
       direction: ltr;
@@ -49,7 +52,7 @@
       color: #f8fafc;
       padding: 18px;
       border-radius: 14px;
-      min-height: 160px;
+      min-height: 100px;
       overflow: auto;
     }
     .example {
@@ -59,24 +62,41 @@
       cursor: pointer;
       line-height: 1.8;
     }
-    .badge {
+    .badge, .status {
       display: inline-block;
-      padding: 4px 10px;
+      padding: 5px 10px;
       border-radius: 999px;
       background: #eef2ff;
       font-size: 13px;
-      margin-bottom: 10px;
+      margin: 0 0 10px 6px;
     }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .metric {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 12px;
+      min-height: 78px;
+    }
+    .metric small { display: block; color: #667085; margin-bottom: 6px; }
+    .metric strong { word-break: break-word; }
+    ol { line-height: 1.9; }
   </style>
 </head>
 <body>
   <main>
     <div class="card">
       <div class="badge">Agents at Work 2026 — Public Demo</div>
+      <span class="status" id="aiStatus">جاري فحص وضع الـAI…</span>
       <h1>3ASEKKA AI Transport Agent</h1>
       <p class="muted">
-        اكتب طلب نقل بضائع باللغة العربية. النسخة العامة تستخرج تفاصيل الطلب،
-        تحدد البيانات الناقصة، تقترح نوع المركبة، وتحول الكلام إلى طلب نقل منظم.
+        وكيل تشغيل لنقل البضائع: يفهم طلب النقل العربي، يجمع الناقص، يقترح المركبة،
+        يجهّز طلب النقل ويقرر الخطوة التشغيلية التالية. عند ضبط مفتاح AI يعمل
+        باستخراج ذكي + أدوات تشغيل؛ وبدون مفتاح يتحول تلقائيًا إلى وضع آمن تجريبي.
       </p>
 
       <p class="example" id="example">
@@ -85,13 +105,18 @@
 
       <textarea id="input" placeholder="اكتب طلب النقل هنا..."></textarea>
       <button id="run">شغّل الوكيل</button>
+    </div>
 
-      <h2>النتيجة</h2>
+    <div class="card">
+      <h2>قرار الوكيل</h2>
+      <div class="grid" id="summary"></div>
+      <h2>خطوات التنفيذ</h2>
+      <ol id="actions"><li>جاهز.</li></ol>
+      <h2>النتيجة التقنية</h2>
       <pre id="output">جاهز.</pre>
-
       <p class="muted">
-        ملاحظة: الأسعار وعروض السائقين في هذه النسخة Demo فقط، ولا توجد أي بيانات
-        إنتاج أو مفاتيح سرية داخل المستودع العام.
+        الأسعار وعروض السائقين في المستودع العام Demo فقط. لا توجد مفاتيح Production
+        أو بيانات مستخدمين أو أسرار Supabase داخل النسخة العامة.
       </p>
     </div>
   </main>
@@ -101,13 +126,71 @@
     const output = document.getElementById("output");
     const example = document.getElementById("example");
     const run = document.getElementById("run");
+    const summary = document.getElementById("summary");
+    const actions = document.getElementById("actions");
+    const aiStatus = document.getElementById("aiStatus");
 
     example.addEventListener("click", () => {
       input.value = example.textContent.trim();
     });
 
+    function metric(label, value) {
+      const box = document.createElement("div");
+      box.className = "metric";
+      const small = document.createElement("small");
+      small.textContent = label;
+      const strong = document.createElement("strong");
+      strong.textContent = value ?? "—";
+      box.append(small, strong);
+      return box;
+    }
+
+    function render(data) {
+      summary.replaceChildren(
+        metric("الحالة", data.status),
+        metric("من", data.request?.pickup),
+        metric("إلى", data.request?.destination),
+        metric("الحمولة", data.request?.cargo),
+        metric("الوزن", data.request?.weightKg != null ? data.request.weightKg + " كجم" : null),
+        metric("المركبة", data.recommendation?.vehicleNameAr),
+        metric("المسافة", data.route?.distanceKm != null ? data.route.distanceKm + " كم" : "سيحسبها Route Engine"),
+        metric("السعر التجريبي", data.pricing?.estimatedFare != null ? data.pricing.estimatedFare + " EGP" : "في انتظار المسافة")
+      );
+
+      actions.replaceChildren();
+      for (const action of data.actions ?? []) {
+        const li = document.createElement("li");
+        li.textContent = action.tool + " — " + action.status;
+        actions.appendChild(li);
+      }
+
+      if (data.followUpQuestionAr) {
+        const li = document.createElement("li");
+        li.textContent = data.followUpQuestionAr;
+        actions.appendChild(li);
+      }
+
+      output.textContent = JSON.stringify(data, null, 2);
+      aiStatus.textContent = data.agent?.aiEnabled
+        ? "AI ON — " + data.agent.provider + (data.agent.model ? " / " + data.agent.model : "")
+        : "Safe fallback — AI key not configured";
+    }
+
+    async function loadStatus() {
+      try {
+        const response = await fetch("/api/status");
+        const data = await response.json();
+        aiStatus.textContent = data.ai?.configured
+          ? "AI configured — " + data.ai.provider
+          : "Safe fallback — AI key not configured";
+      } catch {
+        aiStatus.textContent = "Demo status unavailable";
+      }
+    }
+
     run.addEventListener("click", async () => {
-      output.textContent = "جارٍ التحليل...";
+      output.textContent = "جارٍ التحليل واتخاذ القرار...";
+      run.disabled = true;
       try {
         const response = await fetch("/api/agent", {
           method: "POST",
@@ -115,11 +198,15 @@
           body: JSON.stringify({ input: input.value })
         });
         const data = await response.json();
-        output.textContent = JSON.stringify(data, null, 2);
+        render(data);
       } catch (error) {
         output.textContent = String(error);
+      } finally {
+        run.disabled = false;
       }
     });
+
+    loadStatus();
   </script>
 </body>
 </html>
