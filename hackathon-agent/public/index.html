@@ -44,6 +44,28 @@
       color: #fff;
     }
     button:disabled { opacity: .55; cursor: wait; }
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .voice-button {
+      background: #fff;
+      color: #111827;
+      border: 1px solid #cfd5df;
+    }
+    .voice-button.listening {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #991b1b;
+    }
+    .voice-status {
+      min-height: 24px;
+      margin-top: 8px;
+      color: #667085;
+      font-size: 14px;
+    }
     pre {
       direction: ltr;
       text-align: left;
@@ -104,8 +126,12 @@
         عايز أنقل 20 كرتونة من سموحة إلى المنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو والمسافة 12 كم
       </p>
 
-      <textarea id="input" placeholder="اكتب طلب النقل هنا..."></textarea>
-      <button id="run">شغّل الوكيل</button>
+      <textarea id="input" placeholder="اكتب طلب النقل هنا... أو استخدم زر الميكروفون"></textarea>
+      <div class="controls">
+        <button id="run">شغّل الوكيل</button>
+        <button id="voice" class="voice-button" type="button">🎤 اتكلمي وابعتِ الطلب</button>
+      </div>
+      <div class="voice-status" id="voiceStatus">يمكنك الكتابة أو إرسال الطلب بالصوت باللهجة المصرية.</div>
     </div>
 
     <div class="card">
@@ -128,6 +154,8 @@
     const output = document.getElementById("output");
     const example = document.getElementById("example");
     const run = document.getElementById("run");
+    const voice = document.getElementById("voice");
+    const voiceStatus = document.getElementById("voiceStatus");
     const summary = document.getElementById("summary");
     const actions = document.getElementById("actions");
     const aiStatus = document.getElementById("aiStatus");
@@ -199,21 +227,33 @@
       }
     }
 
-    run.addEventListener("click", async () => {
+    async function submitAgentRequest() {
+      const text = input.value.trim();
+      if (!text) {
+        voiceStatus.textContent = "اكتبي أو قولي طلب النقل الأول.";
+        input.focus();
+        return;
+      }
+
       output.textContent = "جارٍ التحليل واتخاذ القرار...";
       run.disabled = true;
+      voice.disabled = true;
+
       try {
         let data;
         if (serverAvailable) {
           const response = await fetch("/api/agent", {
             method: "POST",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify({ input: input.value })
+            body: JSON.stringify({ input: text })
           });
-          if (!response.ok) throw new Error("Server API unavailable");
+          if (!response.ok) {
+            const details = await response.text();
+            throw new Error("Server API unavailable: " + details.slice(0, 300));
+          }
           data = await response.json();
         } else {
-          data = window.run3AsekkaBrowserFallback(input.value);
+          data = window.run3AsekkaBrowserFallback(text);
         }
         render(data);
       } catch (error) {
@@ -223,15 +263,94 @@
         } else {
           serverAvailable = false;
           try {
-            render(window.run3AsekkaBrowserFallback(input.value));
+            render(window.run3AsekkaBrowserFallback(text));
           } catch (fallbackError) {
             output.textContent = String(fallbackError || error);
           }
         }
       } finally {
         run.disabled = false;
+        voice.disabled = false;
       }
-    });
+    }
+
+    run.addEventListener("click", submitAgentRequest);
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let listening = false;
+
+    function setVoiceListening(active) {
+      listening = active;
+      voice.classList.toggle("listening", active);
+      voice.textContent = active ? "⏹️ إيقاف والاسترسال" : "🎤 اتكلمي وابعتِ الطلب";
+    }
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = "ar-EG";
+      recognition.interimResults = true;
+      recognition.continuous = false;
+      recognition.maxAlternatives = 1;
+
+      let finalTranscript = "";
+
+      recognition.onstart = () => {
+        finalTranscript = "";
+        setVoiceListening(true);
+        voiceStatus.textContent = "🎙️ سامعاكي... اتكلمي بطبيعتك، وهبعت الطلب تلقائيًا لما تخلصي.";
+      };
+
+      recognition.onresult = (event) => {
+        let interim = "";
+        for (let i = event.resultIndex; i < event.results.length; i += 1) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + " ";
+          } else {
+            interim += transcript;
+          }
+        }
+        input.value = (finalTranscript + interim).trim();
+      };
+
+      recognition.onerror = (event) => {
+        setVoiceListening(false);
+        const messages = {
+          "not-allowed": "الميكروفون مرفوض. اسمحي للموقع باستخدام الميكروفون من شريط العنوان.",
+          "audio-capture": "مش لاقية ميكروفون شغال على الجهاز.",
+          "no-speech": "مسمعتش كلام واضح. دوسي الميكروفون وجربي تاني.",
+          "network": "حصلت مشكلة في خدمة تحويل الصوت لنص. جربي تاني."
+        };
+        voiceStatus.textContent = messages[event.error] || ("خطأ في الصوت: " + event.error);
+      };
+
+      recognition.onend = async () => {
+        const hadText = input.value.trim().length > 0;
+        setVoiceListening(false);
+        if (hadText) {
+          voiceStatus.textContent = "✅ فهمت الكلام. جاري إرسال الطلب للوكيل...";
+          await submitAgentRequest();
+        } else {
+          voiceStatus.textContent = "مسمعتش طلب واضح. جربي مرة تانية.";
+        }
+      };
+
+      voice.addEventListener("click", () => {
+        if (listening) {
+          recognition.stop();
+          return;
+        }
+        try {
+          recognition.start();
+        } catch (error) {
+          voiceStatus.textContent = "الميكروفون لسه بيبدأ، جربي بعد لحظة.";
+        }
+      });
+    } else {
+      voice.disabled = true;
+      voiceStatus.textContent = "المتصفح ده لا يدعم الإدخال الصوتي المباشر. افتحي النسخة في Chrome أو Edge حديث.";
+    }
 
     loadStatus();
   </script>
