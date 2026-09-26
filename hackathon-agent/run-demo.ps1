@@ -1,13 +1,24 @@
 $ErrorActionPreference = "Stop"
-Set-Location $PSScriptRoot
+
+$RepoRoot = Split-Path $PSScriptRoot -Parent
+Set-Location $RepoRoot
 
 Write-Host ""
 Write-Host "=== 3ASEKKA AI Transport Agent ===" -ForegroundColor Cyan
+Write-Host "Updating the demo..." -ForegroundColor Yellow
 
-if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-  throw "Node.js 18+ is required."
+try {
+    git pull --ff-only
+} catch {
+    Write-Host "Could not auto-update. Starting the local copy." -ForegroundColor Yellow
 }
 
-Write-Host "Starting demo on http://localhost:3000 ..." -ForegroundColor Green
+Set-Location $PSScriptRoot
+
+if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
+    throw "Node.js 18+ is required."
+}
+
+Write-Host "Opening 3ASEKKA demo..." -ForegroundColor Green
 Start-Process "http://localhost:3000"
 node .\server.mjs
