@@ -4,44 +4,68 @@ Public, isolated hackathon prototype for **Agents at Work 2026**.
 
 ## Problem
 
-Egyptian SMEs, shops and merchants often arrange local goods transport manually through calls and informal driver networks. That can make vehicle selection, pricing, request structuring and driver coordination slow and inconsistent.
+Egyptian SMEs, shops and merchants often arrange local goods transport manually through calls and informal driver networks. The operational problem is not merely answering customers: a transport request must be understood, completed, converted into structured data, routed to the right vehicle class, priced and prepared for driver matching.
 
-## Agent goal
+## What the agent does
 
-Turn a natural Arabic request into an actionable local goods-transport job.
-
-### Example input
+The user writes a natural Arabic request such as:
 
 ```text
 عايز أنقل 20 كرتونة من سموحة إلى المنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو والمسافة 12 كم
 ```
 
-### Example agent decisions
+The agent then:
 
-- Pickup: سموحة
-- Destination: المنشية
-- Cargo: 20 كرتونة
-- Weight: 250 kg
-- Requested time: tomorrow at 15:00
-- Recommended vehicle: تروسيكل
-- Fare: demo estimate
-- Next action: create structured request and proceed to matching/bidding
+1. Extracts the transport intent and fields from Arabic.
+2. Asks only for missing information.
+3. Recommends a vehicle class using transport rules.
+4. Calls the route/pricing stage when enough data exists.
+5. Produces a structured transport job.
+6. Prepares the job for driver matching and bidding.
+7. Keeps production credentials and private integrations outside the public repository.
 
-## Current public prototype
+## AI + tools architecture
 
-The prototype is deliberately isolated from the production 3ASEKKA application.
+This version is no longer only a regex/parser demo.
 
-It currently demonstrates:
+When an AI provider is configured, the agent uses an LLM for natural-language extraction and combines that output with deterministic transport tools. Business decisions such as vehicle capacity and demo pricing are kept outside the model.
 
-- Arabic transport-intent parsing
-- Missing-information detection
-- Vehicle recommendation
-- Demo fare estimation
-- Structured transport-job output
-- Safe simulated driver offers for the public demo
-- A minimal Arabic RTL web interface
+Supported adapters:
 
-The production mobile application, private backend, real driver records, credentials and business-sensitive integrations remain private.
+- Google Gemini via `GEMINI_API_KEY`
+- OpenAI via `OPENAI_API_KEY`
+- Generic OpenAI-compatible endpoint via `LLM_ENDPOINT`
+
+If no AI key is configured, the same application automatically falls back to deterministic Arabic parsing so the public demo does not fail.
+
+```mermaid
+flowchart LR
+  A[Arabic transport request] --> B[AI extraction adapter]
+  A --> C[Deterministic Arabic parser]
+  B --> D[Validated structured fields]
+  C --> D
+  D --> E{Required fields complete?}
+  E -->|No| F[Ask only for missing fields]
+  E -->|Yes| G[Vehicle recommendation tool]
+  G --> H[Route engine boundary]
+  H --> I[Pricing tool]
+  I --> J[Structured transport request]
+  J --> K[Driver matching / bidding boundary]
+```
+
+## Why this is agentic
+
+The model is not allowed to invent business actions or pricing. The orchestration layer decides which tool/stage should run next:
+
+- `extract_transport_request`
+- `request_missing_information`
+- `recommend_vehicle`
+- `calculate_route`
+- `estimate_fare`
+- `prepare_transport_request`
+- `driver_matching_and_bidding`
+
+The public demo returns an explicit action trace so reviewers can see the sequence.
 
 ## Run locally
 
@@ -52,56 +76,52 @@ cd hackathon-agent
 npm start
 ```
 
-Then open:
+Open:
 
 ```text
 http://localhost:3000
 ```
 
-Health check:
+## Enable AI mode
 
-```text
-http://localhost:3000/health
+Never commit the key. Set it only as a local/deployment environment variable.
+
+Gemini example:
+
+```bash
+GEMINI_API_KEY=your_secret_key npm start
 ```
 
-## Public-demo architecture
+Or OpenAI:
 
-```mermaid
-flowchart LR
-  A[Arabic transport request] --> B[Intent + field extraction]
-  B --> C{Missing information?}
-  C -->|Yes| D[Ask only for missing fields]
-  C -->|No| E[Vehicle recommendation]
-  E --> F[Demo fare estimate]
-  F --> G[Structured transport job]
-  G --> H[Driver matching / bidding boundary]
-  H --> I[Simulated public offers]
+```bash
+OPENAI_API_KEY=your_secret_key OPENAI_MODEL=your_model npm start
 ```
+
+The UI and `/api/status` clearly show whether AI mode is active.
+
+## Evaluation
+
+Run:
+
+```bash
+npm run eval
+```
+
+CI runs the deterministic evaluation suite on every hackathon-agent change, without any secret key.
 
 ## Production integration boundary
 
-The private production system already contains transport-request, vehicle, route, pricing, bidding and trip-lifecycle workflows. The hackathon agent is designed as a safe orchestration layer above those workflows.
+The private 3ASEKKA production system already contains transport request, route, pricing, vehicle, bidding and trip lifecycle workflows. The hackathon agent is an orchestration layer designed to sit above those capabilities.
 
-For the public repository, production calls are intentionally replaced by isolated demo logic so no credentials, user data, private schema or production business logic are exposed.
+The public repository intentionally does not include:
 
-## Next hackathon milestones
-
-1. Add an LLM extraction adapter behind a provider-neutral interface.
-2. Connect to a safe sandbox transport-request API.
-3. Replace simulated offers with sandbox bidding events.
-4. Record a 60–120 second demo video.
-5. Add evaluation examples for Egyptian Arabic transport requests.
-
-## Security
-
-Never commit:
-
-- `.env`
+- production source code
 - Supabase service-role keys
-- Google API secrets
-- Firebase private keys
+- Google/Firebase secrets
 - signing keys
-- production database dumps
+- production database schema/dumps
 - private user or driver data
+- private production pricing logic
 
-Only `.env.example` belongs in this public repository.
+Public driver offers remain simulated until a safe sandbox integration is connected.
