@@ -283,7 +283,7 @@
     function setVoiceListening(active) {
       listening = active;
       voice.classList.toggle("listening", active);
-      voice.textContent = active ? "⏹️ إيقاف والاسترسال" : "🎤 اتكلمي وابعتِ الطلب";
+      voice.textContent = active ? "⏹️ إيقاف وإرسال" : "🎤 اتكلمي وابعتِ الطلب";
     }
 
     if (SpeechRecognition) {
@@ -294,9 +294,11 @@
       recognition.maxAlternatives = 1;
 
       let finalTranscript = "";
+      let capturedThisTurn = false;
 
       recognition.onstart = () => {
         finalTranscript = "";
+        capturedThisTurn = false;
         setVoiceListening(true);
         voiceStatus.textContent = "🎙️ سامعاكي... اتكلمي بطبيعتك، وهبعت الطلب تلقائيًا لما تخلصي.";
       };
@@ -305,6 +307,7 @@
         let interim = "";
         for (let i = event.resultIndex; i < event.results.length; i += 1) {
           const transcript = event.results[i][0].transcript;
+          if (transcript && transcript.trim()) capturedThisTurn = true;
           if (event.results[i].isFinal) {
             finalTranscript += transcript + " ";
           } else {
@@ -326,7 +329,7 @@
       };
 
       recognition.onend = async () => {
-        const hadText = input.value.trim().length > 0;
+        const hadText = capturedThisTurn && input.value.trim().length > 0;
         setVoiceListening(false);
         if (hadText) {
           voiceStatus.textContent = "✅ فهمت الكلام. جاري إرسال الطلب للوكيل...";
