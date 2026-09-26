@@ -1,0 +1,66 @@
+3ASEKKA AI TRANSPORT AGENT
+Agents at Work 2026 – Supporting Document
+
+PROJECT
+Name: 3ASEKKA AI Transport Agent
+Product: 3ASEKKA (عالسكة) – an on-demand goods transport platform.
+Public GitHub: https://github.com/SAMA10000/3asekka-case-study
+
+PROBLEM
+Many small businesses, shops, and merchants in Egypt still arrange local goods transport through phone calls and informal driver networks. This can make vehicle selection, pricing, and driver coordination slow and inconsistent.
+
+SOLUTION
+3ASEKKA AI Transport Agent allows the customer to describe a transport request in natural Arabic, either by text or voice.
+
+Example:
+"عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو."
+
+The agent can:
+- Understand Egyptian Arabic.
+- Accept voice or text input.
+- Extract pickup and destination.
+- Understand cargo type and approximate weight.
+- Ask only for missing information.
+- Recommend a suitable vehicle.
+- Estimate the transport fare.
+- Prepare the transport request.
+- Move the customer into the driver-bidding workflow.
+- Display driver offers.
+- Allow the customer to choose an offer.
+
+HOW THE AI AGENT WORKS
+1. Customer types or speaks a transport request.
+2. AI extracts the transport details.
+3. The system validates required information.
+4. Deterministic transport rules recommend a suitable vehicle.
+5. The workflow prepares route/pricing.
+6. A structured transport request is prepared.
+7. Driver offers appear in the bidding workflow.
+8. The customer selects an offer.
+
+WHERE IT FITS INSIDE 3ASEKKA
+The AI Agent is not intended to be a separate application.
+
+Customer Home
+→ اطلب بالكلام أو الصوت
+→ AI fills transport details
+→ Customer confirms request
+→ Waiting for Driver Offers
+→ Driver Bidding
+→ Customer selects driver
+→ Existing 3ASEKKA trip workflow continues
+
+TECHNOLOGY
+- Google Gemini
+- Node.js
+- Custom transport tools
+- Deterministic business rules
+- Egyptian Arabic browser speech recognition
+- Driver bidding workflow
+
+PUBLIC DEMO BOUNDARY
+The public repository does not expose production Supabase secrets, private user data, driver private data, signing keys, production database credentials, or full private production backend logic.
+
+OWNERSHIP
+Copyright © 2026 repository owner SAMA10000. All rights reserved.
+Public visibility is for portfolio and hackathon-review purposes only. No license is granted for commercial reuse, redistribution, or derivative products without explicit written permission.
