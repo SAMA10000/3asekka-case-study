@@ -6,6 +6,7 @@ import { runTransportAgent } from "./agent.mjs";
 import { getAIConfiguration } from "./llm.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const publicDir = path.join(__dirname, "public");
 const port = Number(process.env.PORT ?? 3000);
 
 function sendJson(res, status, body) {
@@ -16,12 +17,24 @@ function sendJson(res, status, body) {
   res.end(JSON.stringify(body, null, 2));
 }
 
+async function servePublicFile(res, filename, contentType) {
+  try {
+    const content = await readFile(path.join(publicDir, filename));
+    res.writeHead(200, { "content-type": contentType });
+    res.end(content);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const server = http.createServer(async (req, res) => {
   if (req.method === "GET" && (req.url === "/" || req.url === "/index.html")) {
-    const html = await readFile(path.join(__dirname, "public", "index.html"), "utf8");
-    res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-    res.end(html);
-    return;
+    if (await servePublicFile(res, "index.html", "text/html; charset=utf-8")) return;
+  }
+
+  if (req.method === "GET" && req.url === "/browser-fallback.js") {
+    if (await servePublicFile(res, "browser-fallback.js", "text/javascript; charset=utf-8")) return;
   }
 
   if (req.method === "GET" && req.url === "/api/status") {
