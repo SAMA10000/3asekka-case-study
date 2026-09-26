@@ -1,0 +1,100 @@
+3ASEKKA AI TRANSPORT AGENT
+Agents at Work 2026 – Supporting Document
+
+1. PROJECT
+Name: 3ASEKKA AI Transport Agent
+Product: 3ASEKKA (عالسكة) – an on-demand goods transport platform.
+Public GitHub: https://github.com/SAMA10000/3asekka-case-study
+Hackathon project folder: hackathon-agent/
+
+2. THE PROBLEM
+Many small businesses, shops, and merchants in Egypt still arrange local goods transport through phone calls and informal driver networks.
+This can make the process slow and inconsistent:
+- The customer must explain the load manually.
+- The correct vehicle may be unclear.
+- Pricing may be difficult to estimate.
+- Driver offers are difficult to compare.
+- Important details can be missed during calls.
+
+3. THE SOLUTION
+3ASEKKA AI Transport Agent allows the customer to describe a transport request in natural Arabic, either by text or voice.
+Example:
+"عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو."
+
+The agent can:
+- Understand Egyptian Arabic.
+- Accept voice or text input.
+- Extract pickup and destination.
+- Understand cargo type and approximate weight.
+- Ask only for missing information.
+- Recommend a suitable vehicle.
+- Estimate the transport fare.
+- Prepare the transport request.
+- Move the customer into the driver-bidding workflow.
+- Display driver offers.
+- Allow the customer to choose an offer.
+
+4. HOW THE AI AGENT WORKS
+1) Customer types or speaks a natural Arabic transport request.
+2) Gemini handles language understanding and extracts the transport details.
+3) The system validates required information and does not allow the AI to invent critical transport data.
+4) Deterministic transport rules recommend a suitable vehicle.
+5) The route/pricing stage estimates the fare when distance is available.
+6) The request becomes a structured transport job.
+7) Suitable driver offers appear in the bidding workflow.
+8) The customer compares offers and selects a driver.
+
+5. WHERE THIS FITS INSIDE THE 3ASEKKA APP
+The AI Agent is not a separate application. It is designed as an easier way to create a transport request inside the existing 3ASEKKA customer app.
+
+Customer Home
+→ "اطلب بالكلام أو الصوت"
+→ Customer speaks or types the transport request
+→ AI fills the transport details automatically
+→ Customer confirms the request
+→ Waiting for Driver Offers
+→ Driver Bidding
+→ Customer selects a driver
+→ Existing 3ASEKKA trip workflow continues
+
+6. WHY IT IS MORE THAN A CHATBOT
+The agent converts natural language into transport operations and decides which workflow step should happen next.
+Agent actions include:
+- extract_transport_request
+- request_missing_information
+- recommend_vehicle
+- calculate_route
+- estimate_fare
+- prepare_transport_request
+- driver_matching_and_bidding
+
+7. TECHNOLOGY
+AI: Google Gemini
+Backend: Node.js
+Agent logic: Custom transport tools and deterministic business rules
+Voice: Egyptian Arabic browser speech recognition
+Workflow: Vehicle recommendation, fare estimation, request preparation, and driver bidding
+Existing product integration: 3ASEKKA transport workflow
+
+8. SAFETY AND RELIABILITY
+The public hackathon repository does not expose:
+- Production Supabase secrets
+- Private user or driver data
+- Signing keys
+- Production database credentials
+- Private production backend logic
+
+If the AI provider is unavailable, the demo can fall back to deterministic parsing rather than failing completely.
+
+9. DEMO FLOW
+1) Capture request by text or voice.
+2) Extract pickup, destination, cargo, weight, and time.
+3) Recommend a suitable vehicle.
+4) Show an estimated fare.
+5) Show driver offers.
+6) Compare offers.
+7) Select a driver.
+
+10. HACKATHON VALUE
+The project focuses on a real operational problem for Egyptian businesses: making local goods transport easier to request, understand, price, and coordinate.
+The AI layer is designed to work on top of an existing transport product rather than as a standalone chatbot.
