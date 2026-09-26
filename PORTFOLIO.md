@@ -1,5 +1,16 @@
 # 3ASEKKA AI Transport Agent — Portfolio Showcase
 
+## Client / recruiter quick scan
+
+**What I built:** an AI-assisted transport-request workflow that accepts Egyptian Arabic by text or voice and turns it into an operational goods-transport request.
+
+**What it proves:** AI orchestration, product workflow design, transport-domain logic, voice UX, vehicle selection, fare estimation, bidding UX, Node.js integration, and safe public/private system boundaries.
+
+**Best fit for:** AI agent work, workflow automation, logistics products, realtime mobile apps, Supabase systems, and operational MVPs.
+
+**Contact:** https://github.com/SAMA10000
+
+
 **Hackathon:** Agents at Work 2026  
 **Product:** 3ASEKKA (عالسكة)  
 **Repository owner:** SAMA10000
