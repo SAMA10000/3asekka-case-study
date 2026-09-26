@@ -1,3 +1,5 @@
+import { extractTransportWithAI } from "./llm.mjs";
+
 const VEHICLES = [
   { id: "motorbike", ar: "موتوسيكل", maxKg: 50 },
   { id: "tricycle", ar: "تروسيكل", maxKg: 300 },
@@ -24,8 +26,16 @@ const pricing = {
   }
 };
 
+function toLatinDigits(text = "") {
+  const arabic = "٠١٢٣٤٥٦٧٨٩";
+  const eastern = "۰۱۲۳۴۵۶۷۸۹";
+  return String(text)
+    .replace(/[٠-٩]/g, (d) => String(arabic.indexOf(d)))
+    .replace(/[۰-۹]/g, (d) => String(eastern.indexOf(d)));
+}
+
 function normalizeArabic(text = "") {
-  return text
+  return toLatinDigits(text)
     .replace(/[أإآ]/g, "ا")
     .replace(/ى/g, "ي")
     .replace(/ة/g, "ه")
@@ -40,7 +50,7 @@ function firstNumber(text, pattern) {
 }
 
 function extractRoute(original) {
-  const text = original.replace(/\s+/g, " ").trim();
+  const text = toLatinDigits(original).replace(/\s+/g, " ").trim();
   const patterns = [
     /من\s+(.+?)\s+(?:إلى|الى|لـ|ل)\s*([^،,.]+?)(?=\s+(?:بكره|بكرة|غدا|غداً|الساعة|الساعه|وزن|وزنهم|حوالي|مساف|عدد|ومعايا|ومعي)|[،,.]|$)/i,
     /من\s+(.+?)\s+(?:إلى|الى|لـ)\s*([^،,.]+)/i
@@ -61,7 +71,7 @@ function extractRoute(original) {
 function extractCargo(original) {
   const normalized = normalizeArabic(original);
 
-  const countMatch = normalized.match(/(\d+)\s*(كرتونه|كرتون|صندوق|طرد|قطعه)/);
+  const countMatch = normalized.match(/(\d+)\s*(كرتونه|كرتون|صندوق|طرد|قطعه|شوال|جوال)/);
   if (countMatch) {
     return {
       description: `${countMatch[1]} ${countMatch[2]}`,
@@ -69,7 +79,18 @@ function extractCargo(original) {
     };
   }
 
-  const cargoWords = ["اثاث", "ملابس", "اجهزه", "بضاعه", "معدات", "ادوات", "خضار", "فاكهه"];
+  const cargoWords = [
+    "اثاث",
+    "ملابس",
+    "اجهزه",
+    "بضاعه",
+    "معدات",
+    "ادوات",
+    "خضار",
+    "فاكهه",
+    "مواد غذائيه",
+    "مستلزمات"
+  ];
   const word = cargoWords.find((w) => normalized.includes(w));
   return { description: word ?? null, units: null };
 }
@@ -84,6 +105,45 @@ function extractRequestedTime(original) {
     day,
     hour: time ? Number(time[1]) : null,
     minute: time?.[2] ? Number(time[2]) : 0
+  };
+}
+
+function heuristicExtract(input) {
+  const normalized = normalizeArabic(input);
+  const route = extractRoute(input);
+  const cargo = extractCargo(input);
+
+  return {
+    pickup: route.pickup,
+    destination: route.destination,
+    cargo: cargo.description,
+    units: cargo.units,
+    weightKg: firstNumber(normalized, /(\d+(?:\.\d+)?)\s*(?:كيلو|كجم|kg)/i),
+    distanceKm: firstNumber(normalized, /(\d+(?:\.\d+)?)\s*(?:كم|كيلومتر|km)/i),
+    requestedTime: extractRequestedTime(input)
+  };
+}
+
+function safeNumber(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const n = Number(value);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+function safeText(value) {
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+function mergeExtraction(rules, ai) {
+  const aiData = ai?.data ?? {};
+  return {
+    pickup: safeText(rules.pickup) ?? safeText(aiData.pickup),
+    destination: safeText(rules.destination) ?? safeText(aiData.destination),
+    cargo: safeText(rules.cargo) ?? safeText(aiData.cargo),
+    units: safeNumber(rules.units) ?? safeNumber(aiData.units),
+    weightKg: safeNumber(rules.weightKg) ?? safeNumber(aiData.weightKg),
+    distanceKm: safeNumber(rules.distanceKm) ?? safeNumber(aiData.distanceKm),
+    requestedTime: rules.requestedTime ?? aiData.requestedTime ?? null
   };
 }
 
@@ -114,36 +174,93 @@ function createSimulatedOffers(estimatedFare) {
   }));
 }
 
-export function runTransportAgent(input) {
-  const normalized = normalizeArabic(input);
-  const route = extractRoute(input);
-  const cargo = extractCargo(input);
+function buildArabicQuestion(missing) {
+  const labels = {
+    pickup: "مكان الاستلام",
+    destination: "مكان التسليم",
+    cargo: "نوع أو وصف الحمولة",
+    weightKg: "الوزن التقريبي بالكيلو"
+  };
+  const needed = missing.map((x) => labels[x]).filter(Boolean);
+  if (!needed.length) return null;
+  return `محتاج أعرف ${needed.join(" و")} علشان أكمل طلب النقل.`;
+}
 
-  const weightKg = firstNumber(normalized, /(\d+(?:\.\d+)?)\s*(?:كيلو|كجم|kg)/i);
-  const distanceKm = firstNumber(normalized, /(\d+(?:\.\d+)?)\s*(?:كم|كيلومتر|km)/i);
-  const requestedTime = extractRequestedTime(input);
-  const vehicle = recommendVehicle(weightKg);
-  const estimatedFare = estimateFare(vehicle?.id, distanceKm);
+export async function runTransportAgent(input) {
+  const rules = heuristicExtract(input);
+  const ai = await extractTransportWithAI(input);
+  const request = mergeExtraction(rules, ai);
 
   const missing = [];
-  if (!route.pickup) missing.push("pickup");
-  if (!route.destination) missing.push("destination");
-  if (!cargo.description) missing.push("cargo");
-  if (!Number.isFinite(weightKg)) missing.push("weightKg");
-  if (!Number.isFinite(distanceKm)) missing.push("distanceKm");
+  if (!request.pickup) missing.push("pickup");
+  if (!request.destination) missing.push("destination");
+  if (!request.cargo) missing.push("cargo");
+  if (!Number.isFinite(request.weightKg)) missing.push("weightKg");
+
+  const vehicle = recommendVehicle(request.weightKg);
+  const estimatedFare = estimateFare(vehicle?.id, request.distanceKm);
+  const offers = createSimulatedOffers(estimatedFare);
+
+  const actions = [
+    {
+      tool: "extract_transport_request",
+      status: "done",
+      source: ai.used ? `ai:${ai.provider}` : "deterministic_fallback"
+    }
+  ];
+
+  if (missing.length) {
+    actions.push({
+      tool: "request_missing_information",
+      status: "waiting_for_user",
+      fields: missing
+    });
+  } else {
+    actions.push({
+      tool: "recommend_vehicle",
+      status: "done",
+      vehicleId: vehicle?.id ?? null
+    });
+
+    actions.push({
+      tool: "calculate_route",
+      status: Number.isFinite(request.distanceKm) ? "distance_supplied_for_demo" : "sandbox_integration_required"
+    });
+
+    actions.push({
+      tool: "estimate_fare",
+      status: Number.isFinite(estimatedFare) ? "done" : "waiting_for_route_distance"
+    });
+
+    actions.push({
+      tool: "prepare_transport_request",
+      status: "done"
+    });
+
+    actions.push({
+      tool: "driver_matching_and_bidding",
+      status: offers.length ? "simulated_public_demo" : "waiting_for_fare"
+    });
+  }
+
+  const status = missing.length
+    ? "needs_information"
+    : Number.isFinite(request.distanceKm)
+      ? "ready_for_matching"
+      : "ready_for_routing";
 
   return {
-    status: missing.length ? "needs_information" : "ready_for_matching",
-    intent: "local_goods_transport",
-    request: {
-      pickup: route.pickup,
-      destination: route.destination,
-      cargo: cargo.description,
-      units: cargo.units,
-      weightKg,
-      distanceKm,
-      requestedTime
+    agent: {
+      name: "3ASEKKA AI Transport Agent",
+      aiEnabled: Boolean(ai.used),
+      mode: ai.used ? "ai_plus_transport_tools" : "deterministic_safe_fallback",
+      provider: ai.provider ?? null,
+      model: ai.model ?? null,
+      aiError: ai.error ?? null
     },
+    status,
+    intent: "local_goods_transport",
+    request,
     recommendation: vehicle
       ? {
           vehicleId: vehicle.id,
@@ -151,18 +268,28 @@ export function runTransportAgent(input) {
           reason:
             vehicle.id === "needs_review"
               ? "الحمولة أكبر من حدود المركبات الموجودة في النسخة العامة ويجب مراجعتها."
-              : `الوزن المعلن يقع داخل الحد الاسترشادي لهذه المركبة (${vehicle.maxKg} كجم).`
+              : `ترشيح أولي حسب الوزن المعلن، داخل الحد الاسترشادي للمركبة (${vehicle.maxKg} كجم).`
         }
       : null,
+    route: {
+      distanceKm: request.distanceKm,
+      source: Number.isFinite(request.distanceKm)
+        ? "user_supplied_demo_value"
+        : "production_route_engine_boundary"
+    },
     pricing: {
       estimatedFare,
       currency: "EGP",
       demoOnly: true
     },
-    offers: createSimulatedOffers(estimatedFare),
+    offers,
     missing,
+    followUpQuestionAr: buildArabicQuestion(missing),
+    actions,
     nextAction: missing.length
-      ? `Ask only for: ${missing.join(", ")}`
-      : "Create structured request and proceed to driver matching/bidding."
+      ? "Collect only the missing transport fields."
+      : Number.isFinite(request.distanceKm)
+        ? "Structured request is ready for sandbox driver matching/bidding."
+        : "Call the route engine, then estimate fare and continue to matching."
   };
 }
