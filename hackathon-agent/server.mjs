@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { runTransportAgent } from "./agent.mjs";
-import { getAIConfiguration } from "./llm.mjs";
+import { getAIConfiguration, extractTransportWithAI } from "./llm.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, "public");
@@ -46,6 +46,16 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (req.method === "GET" && req.url === "/api/ai-test") {
+    const probe = await extractTransportWithAI("عايز أنقل 5 كراتين من سموحة للمنشية وزنهم 40 كيلو");
+    sendJson(res, 200, {
+      ok: true,
+      configured: getAIConfiguration(),
+      probe
+    });
+    return;
+  }
+
   if (req.method === "POST" && req.url === "/api/agent") {
     let body = "";
     for await (const chunk of req) body += chunk;
@@ -62,7 +72,8 @@ const server = http.createServer(async (req, res) => {
       const result = await runTransportAgent(input);
       sendJson(res, 200, result);
     } catch (error) {
-      sendJson(res, 400, { error: "invalid request", details: String(error) });
+      console.error("POST /api/agent failed:", error);
+      sendJson(res, 500, { error: "agent_execution_failed", details: String(error) });
     }
     return;
   }
