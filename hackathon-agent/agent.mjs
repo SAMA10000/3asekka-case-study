@@ -52,8 +52,8 @@ function firstNumber(text, pattern) {
 function extractRoute(original) {
   const text = toLatinDigits(original).replace(/\s+/g, " ").trim();
   const patterns = [
-    /من\s+(.+?)\s+(?:إلى|الى|لـ|ل)\s*([^،,.]+?)(?=\s+(?:بكره|بكرة|غدا|غداً|الساعة|الساعه|وزن|وزنهم|حوالي|مساف|عدد|ومعايا|ومعي)|[،,.]|$)/i,
-    /من\s+(.+?)\s+(?:إلى|الى|لـ)\s*([^،,.]+)/i
+    /من\s+(.+?)\s+(?:إلى|الى|لحد|لـ|ل)\s*([^،,.]+?)(?=\s+(?:بكره|بكرة|غدا|غداً|الساعة|الساعه|وزن|وزنهم|حوالي|مساف|عدد|ومعايا|ومعي|والحموله|والحمولة|حموله|حمولة)|[،,.]|$)/i,
+    /من\s+(.+?)\s+(?:إلى|الى|لحد|لـ)\s*([^،,.]+)/i
   ];
 
   for (const pattern of patterns) {
@@ -61,7 +61,7 @@ function extractRoute(original) {
     if (match) {
       return {
         pickup: match[1].trim(),
-        destination: match[2].trim()
+        destination: match[2].trim().replace(/^حد\s+/, "")
       };
     }
   }
@@ -108,6 +108,21 @@ function extractRequestedTime(original) {
   };
 }
 
+function extractWeightKg(normalized) {
+  const kg = firstNumber(normalized, /(\d+(?:\.\d+)?)\s*(?:كيلو|كجم|kg)/i);
+  if (Number.isFinite(kg)) return kg;
+
+  const tons = firstNumber(normalized, /(\d+(?:\.\d+)?)\s*(?:طن|ton|tons)/i);
+  if (Number.isFinite(tons)) return tons * 1000;
+
+  if (/(?:نص|نصف)\s*طن/.test(normalized)) return 500;
+  if (/ربع\s*طن/.test(normalized)) return 250;
+  if (/(?:تلت|ثلث)\s*طن/.test(normalized)) return 333;
+  if (/(?:تلات\s*تربع|ثلاثه\s*ارباع|ثلاثة\s*أرباع)\s*طن/.test(normalized)) return 750;
+
+  return null;
+}
+
 function heuristicExtract(input) {
   const normalized = normalizeArabic(input);
   const route = extractRoute(input);
@@ -118,7 +133,7 @@ function heuristicExtract(input) {
     destination: route.destination,
     cargo: cargo.description,
     units: cargo.units,
-    weightKg: firstNumber(normalized, /(\d+(?:\.\d+)?)\s*(?:كيلو|كجم|kg)/i),
+    weightKg: extractWeightKg(normalized),
     distanceKm: firstNumber(normalized, /(\d+(?:\.\d+)?)\s*(?:كم|كيلومتر|km)/i),
     requestedTime: extractRequestedTime(input)
   };
