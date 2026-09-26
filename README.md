@@ -1,14 +1,89 @@
-## Portfolio Showcase
-
-- [3ASEKKA AI Transport Agent — portfolio overview](PORTFOLIO.md)
-- [Hackathon supporting document](SUPPORTING_DOCUMENT.txt)
-- [Ownership / usage notice](LICENSE.md)
-
-> **Agents at Work 2026:** public hackathon prototype → [3ASEKKA AI Transport Agent](HACKATHON.md)
+<div align="center">
 
 # 3ASEKKA — عالسكة
-## Production On-Demand Goods Transportation Platform
-### Uber / Careem / inDrive-style operating model for logistics and goods transport
+### AI-assisted on-demand goods transport for Egypt
+
+**Natural Arabic / Voice → Structured Transport Request → Vehicle & Fare → Driver Bids → Driver Selection**
+
+[![Portfolio](https://img.shields.io/badge/Portfolio-Case%20Study-E65100?style=for-the-badge)](PORTFOLIO.md)
+[![Hackathon](https://img.shields.io/badge/Agents%20at%20Work-2026-111827?style=for-the-badge)](HACKATHON.md)
+[![Work With Me](https://img.shields.io/badge/Available%20for-AI%20%26%20Product%20Work-15803D?style=for-the-badge)](WORK_WITH_ME.md)
+
+</div>
+
+> **PORTFOLIO / HACKATHON SHOWCASE — PRODUCTION CODE REMAINS PRIVATE**
+>
+> This public repository is intentionally limited to demonstration code, documentation, architecture, and reduced visuals. Production secrets, private user data, full backend logic, signing keys, and production credentials are not published.
+
+## 30-second overview
+
+**3ASEKKA AI Transport Agent** lets a customer describe a goods-transport need in natural Egyptian Arabic — by **text or voice** — and converts it into an operational transport flow.
+
+**Example:**  
+“عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو.”
+
+The agent can then:
+
+- understand pickup, destination, cargo, weight and timing;
+- ask only for missing transport information;
+- recommend a suitable vehicle;
+- estimate the fare;
+- prepare the transport request;
+- move into the driver-bidding flow;
+- show driver offers and allow the customer to select one.
+
+### Product placement inside 3ASEKKA
+
+```text
+Customer Home
+   ↓
+"اطلب بالكلام أو الصوت"
+   ↓
+AI understands and structures the transport request
+   ↓
+Customer confirms
+   ↓
+Waiting for Driver Offers
+   ↓
+Bidding / Offer Comparison
+   ↓
+Driver Selection
+   ↓
+Existing 3ASEKKA trip lifecycle
+```
+
+## Why this matters
+
+This is not a generic chatbot. The AI is used for **language understanding**, while transport-critical decisions remain explicit and inspectable through deterministic business rules and workflow tools.
+
+**Portfolio proof:** the repository demonstrates AI orchestration, Arabic voice input, transport-domain reasoning, vehicle recommendation, fare logic, driver bidding, realtime product thinking, and safe separation between public demo code and private production systems.
+
+## Quick links
+
+- **AI Agent portfolio overview:** [PORTFOLIO.md](PORTFOLIO.md)
+- **Hackathon entry:** [HACKATHON.md](HACKATHON.md)
+- **Run the public agent demo:** [hackathon-agent/README.md](hackathon-agent/README.md)
+- **Production case-study visuals:** [SHOWCASE.md](SHOWCASE.md)
+- **Work / collaboration:** [WORK_WITH_ME.md](WORK_WITH_ME.md)
+- **Ownership & usage restrictions:** [LICENSE.md](LICENSE.md)
+
+## Open to work / collaboration
+
+Available for projects involving:
+
+- AI agents and workflow automation
+- React Native / Expo mobile applications
+- Supabase / PostgreSQL / Realtime systems
+- Logistics, transport, marketplace and bidding products
+- OCR / KYC / document-verification workflows
+- Google Maps / Routes and live-tracking products
+- Product prototyping from idea to working MVP
+
+**Contact through GitHub:** [SAMA10000](https://github.com/SAMA10000)
+
+---
+
+## Production Case Study
 
 > **VIEW-ONLY PORTFOLIO / CASE STUDY — NOT OPEN SOURCE**
 >
