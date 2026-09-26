@@ -1,3 +1,9 @@
+## Portfolio Showcase
+
+- [3ASEKKA AI Transport Agent — portfolio overview](PORTFOLIO.md)
+- [Hackathon supporting document](SUPPORTING_DOCUMENT.txt)
+- [Ownership / usage notice](LICENSE.md)
+
 > **Agents at Work 2026:** public hackathon prototype → [3ASEKKA AI Transport Agent](HACKATHON.md)
 
 # 3ASEKKA — عالسكة
