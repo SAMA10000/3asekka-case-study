@@ -41,16 +41,18 @@ function extractJson(text) {
 
 async function callGemini(input) {
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+  const model = process.env.GEMINI_MODEL || "gemini-3.8-flash";
   const url =
     "https://generativelanguage.googleapis.com/v1beta/models/" +
     encodeURIComponent(model) +
-    ":generateContent?key=" +
-    encodeURIComponent(apiKey);
+    ":generateContent";
 
   const response = await fetch(url, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      "x-goog-api-key": apiKey
+    },
     body: JSON.stringify({
       contents: [
         {
@@ -110,7 +112,7 @@ export function getAIConfiguration() {
     return {
       configured: true,
       provider: "gemini",
-      model: process.env.GEMINI_MODEL || "gemini-2.5-flash"
+      model: process.env.GEMINI_MODEL || "gemini-3.8-flash"
     };
   }
 
