@@ -132,3 +132,16 @@ Public driver offers remain simulated until a safe sandbox integration is connec
 A GitHub Pages workflow is included for a public zero-secret demo. On Pages, the UI uses a
 browser-side deterministic fallback so no API key is exposed. For the strongest hackathon
 recording, run the Node server with an AI provider key locally or on a server-side host.
+
+
+## Voice input
+
+The demo UI supports direct Egyptian Arabic voice requests in compatible Chromium browsers.
+
+- Press **🎤 اتكلمي وابعتِ الطلب**
+- Browser speech recognition runs with `ar-EG`
+- The live transcript appears in the request box
+- When speaking ends, the request is automatically submitted to the transport agent
+- Microphone permission is requested by the browser on first use
+
+This is an input channel only; the same agent workflow handles typed and spoken requests.
