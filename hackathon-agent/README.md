@@ -125,3 +125,10 @@ The public repository intentionally does not include:
 - private production pricing logic
 
 Public driver offers remain simulated until a safe sandbox integration is connected.
+
+
+## Public static live demo
+
+A GitHub Pages workflow is included for a public zero-secret demo. On Pages, the UI uses a
+browser-side deterministic fallback so no API key is exposed. For the strongest hackathon
+recording, run the Node server with an AI provider key locally or on a server-side host.
