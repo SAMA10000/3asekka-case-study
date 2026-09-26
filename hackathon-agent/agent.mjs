@@ -181,10 +181,18 @@ function estimateFare(vehicleId, distanceKm) {
 function createSimulatedOffers(estimatedFare) {
   if (!Number.isFinite(estimatedFare)) return [];
   const multipliers = [0.95, 1, 1.08];
+  const drivers = [
+    { name: "أحمد", rating: 4.8, completedTrips: 326 },
+    { name: "محمود", rating: 4.9, completedTrips: 514 },
+    { name: "كريم", rating: 4.7, completedTrips: 281 }
+  ];
+
   return multipliers.map((m, index) => ({
     id: `demo-offer-${index + 1}`,
+    driverName: drivers[index].name,
     amount: Math.round(estimatedFare * m),
-    rating: [4.7, 4.9, 4.6][index],
+    rating: drivers[index].rating,
+    completedTrips: drivers[index].completedTrips,
     simulated: true
   }));
 }
