@@ -4,7 +4,7 @@ Public hackathon entry point for **3ASEKKA (عالسكة)**.
 
 ## Live demo
 
-**Try the deployed agent:** https://3asekka.com/ai-agent/
+**Try the deployed agent:** https://3asekka.com/agent/
 
 Recommended reviewer test:
 
