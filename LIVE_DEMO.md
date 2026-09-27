@@ -2,7 +2,7 @@
 
 ## Open the deployed agent
 
-**https://3asekka.com/ai-agent/**
+**https://3asekka.com/agent/**
 
 This is the public hackathon / portfolio deployment of the 3ASEKKA AI Transport Agent.
 
