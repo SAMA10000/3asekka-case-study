@@ -5,7 +5,7 @@
 
 **Natural Arabic / Voice → Structured Transport Request → Vehicle & Fare → Driver Bids → Driver Selection**
 
-[![Live AI Demo](https://img.shields.io/badge/Try%20Live-AI%20Transport%20Agent-FF6B1A?style=for-the-badge)](https://3asekka.com/ai-agent/)
+[![Live AI Demo](https://img.shields.io/badge/Try%20Live-AI%20Transport%20Agent-FF6B1A?style=for-the-badge)](https://3asekka.com/agent/)
 [![Portfolio](https://img.shields.io/badge/Portfolio-Case%20Study-E65100?style=for-the-badge)](PORTFOLIO.md)
 [![Hackathon](https://img.shields.io/badge/Agents%20at%20Work-2026-111827?style=for-the-badge)](HACKATHON.md)
 [![Work With Me](https://img.shields.io/badge/Available%20for-AI%20%26%20Product%20Work-15803D?style=for-the-badge)](WORK_WITH_ME.md)
@@ -18,7 +18,7 @@
 
 ## Live demo
 
-**Live AI Agent:** https://3asekka.com/ai-agent/
+**Live AI Agent:** https://3asekka.com/agent/
 
 Open the link in Chrome or Edge, type or speak an Egyptian Arabic transport request, review the structured transport details, watch driver offers appear, and select an offer.
 
@@ -69,7 +69,7 @@ This is not a generic chatbot. The AI is used for **language understanding**, wh
 
 - **AI Agent portfolio overview:** [PORTFOLIO.md](PORTFOLIO.md)
 - **Hackathon entry:** [HACKATHON.md](HACKATHON.md)
-- **Try the live AI Agent:** https://3asekka.com/ai-agent/
+- **Try the live AI Agent:** https://3asekka.com/agent/
 - **Agent technical notes:** [hackathon-agent/README.md](hackathon-agent/README.md)
 - **Production case-study visuals:** [SHOWCASE.md](SHOWCASE.md)
 - **Work / collaboration:** [WORK_WITH_ME.md](WORK_WITH_ME.md)
