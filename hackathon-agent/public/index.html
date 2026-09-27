@@ -4,1255 +4,808 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>عالسكة | 3ASEKKA</title>
+  <meta name="theme-color" content="#f15a00" />
   <style>
-    :root {
-      --primary: #E65100;
-      --primary-dark: #BF360C;
-      --primary-soft: #FFF3E0;
-      --ink: #111827;
-      --muted: #667085;
-      --line: #EAECF0;
-      --bg: #F7F8FA;
-      --card: #FFFFFF;
-      --success: #15803D;
-      --success-soft: #ECFDF3;
-      --warning: #B45309;
-      --warning-soft: #FFF7ED;
+    :root{
+      --orange:#f15a00;
+      --orange2:#dc4300;
+      --ink:#111827;
+      --muted:#667085;
+      --line:#e7eaf0;
+      --bg:#eef1f5;
+      --card:#fff;
+      --soft:#fff4ea;
+      --success:#15803d;
+      --success-bg:#ecfdf3;
+      --warning:#b45309;
+      --warning-bg:#fff7ed;
     }
-
-    * { box-sizing: border-box; }
-
-    html { background: #E9EDF2; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Tahoma, Arial, system-ui, sans-serif;
-      background: #E9EDF2;
-      color: var(--ink);
+    *{box-sizing:border-box}
+    html{background:var(--bg)}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:Tahoma,Arial,system-ui,sans-serif;
+      background:var(--bg);
+      color:var(--ink);
     }
-
-    button, textarea { font-family: inherit; }
-
-    .app-shell {
-      width: min(430px, 100vw);
-      margin: 0 auto;
-      min-height: 100svh;
-      background: #F4F6F8;
-      overflow: hidden;
-      box-shadow: 0 0 42px rgba(15, 23, 42, .14);
+    button,textarea{font:inherit}
+    .phone{
+      width:min(430px,100vw);
+      min-height:100svh;
+      margin:0 auto;
+      background:#f7f8fa;
+      overflow:hidden;
+      box-shadow:0 0 42px rgba(15,23,42,.14);
     }
-
-    .status-bar {
-      height: 30px;
-      padding: 8px 18px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .2px;
-      color: #fff;
-      position: relative;
-      z-index: 2;
-    }
-
-    .status-icons {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 13px;
-      direction: ltr;
-    }
-
-    .hero {
-      position: relative;
-      overflow: hidden;
+    .hero{
+      position:relative;
+      overflow:hidden;
+      padding:0 18px 28px;
+      color:#fff;
       background:
-        radial-gradient(circle at 12% 8%, rgba(255,255,255,.10), transparent 22%),
-        linear-gradient(145deg, #F45B00 0%, #DF4300 54%, #C93308 100%);
-      color: #fff;
-      padding: 0 18px 28px;
-      border-radius: 0 0 28px 28px;
-      box-shadow: 0 12px 30px rgba(230, 81, 0, .20);
+        radial-gradient(circle at 12% 8%,rgba(255,255,255,.11),transparent 23%),
+        linear-gradient(145deg,#f45b00 0%,#e54800 56%,#c9360b 100%);
+      border-radius:0 0 28px 28px;
+      box-shadow:0 12px 30px rgba(230,81,0,.20);
     }
-
-    .hero::after {
-      content: "";
-      position: absolute;
-      inset: auto -35px -54px auto;
-      width: 260px;
-      height: 150px;
-      border: 20px solid rgba(255,255,255,.07);
-      border-left-color: transparent;
-      border-bottom-color: transparent;
-      border-radius: 50%;
-      transform: rotate(-12deg);
-      pointer-events: none;
+    .hero:after{
+      content:"";
+      position:absolute;
+      width:290px;height:160px;
+      right:-48px;bottom:-76px;
+      border:22px solid rgba(255,255,255,.07);
+      border-left-color:transparent;border-bottom-color:transparent;
+      border-radius:50%;transform:rotate(-10deg);
+      pointer-events:none;
     }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin: 10px 0 22px;
+    .statusbar{
+      height:34px;
+      padding:8px 0 0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      direction:ltr;
+      font-size:12px;
+      font-weight:900;
+      position:relative;
+      z-index:2;
     }
-
-    .brand {
-      font-size: 27px;
-      font-weight: 900;
-      letter-spacing: -.5px;
+    .statusicons{display:flex;gap:6px;align-items:center;font-size:12px}
+    .topbar{
+      position:relative;
+      z-index:2;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin:8px 0 20px;
     }
-
-    .brand small {
-      display: block;
-      font-size: 11px;
-      font-weight: 700;
-      opacity: .82;
-      letter-spacing: 1.6px;
-      margin-top: 2px;
+    .logo-wrap{
+      min-width:155px;
+      min-height:56px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
     }
-
-    .lang-btn {
-      border: 1px solid rgba(255,255,255,.45);
-      background: rgba(255,255,255,.14);
-      color: #fff;
-      border-radius: 999px;
-      padding: 9px 14px;
-      font-size: 13px;
-      font-weight: 800;
-      cursor: pointer;
+    .logo-wrap img{
+      display:block;
+      max-width:168px;
+      max-height:58px;
+      object-fit:contain;
     }
-
-    .hero h1 {
-      position: relative;
-      z-index: 1;
-      margin: 0;
-      max-width: 360px;
-      font-size: clamp(30px, 8.2vw, 36px);
-      line-height: 1.18;
-      letter-spacing: -.4px;
+    .lang{
+      width:54px;height:38px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.48);
+      background:rgba(255,255,255,.10);
+      color:#fff;font-weight:900;cursor:pointer;
     }
-
-    .hero p {
-      position: relative;
-      z-index: 1;
-      margin: 12px 0 0;
-      max-width: 360px;
-      font-size: 13px;
-      line-height: 1.75;
-      opacity: .94;
+    .hero h1{
+      position:relative;z-index:2;
+      margin:0;
+      max-width:370px;
+      font-size:34px;
+      line-height:1.16;
+      font-weight:900;
+      letter-spacing:-.4px;
     }
-
-    .content {
-      padding: 14px 12px 32px;
+    .hero p{
+      position:relative;z-index:2;
+      margin:12px 0 0;
+      max-width:360px;
+      font-size:13px;
+      line-height:1.75;
+      opacity:.95;
     }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      padding: 15px;
-      margin-bottom: 13px;
-      box-shadow: 0 7px 22px rgba(16,24,40,.06);
+    .content{padding:14px 11px 34px}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:23px;
+      padding:15px;
+      margin-bottom:13px;
+      box-shadow:0 7px 22px rgba(16,24,40,.06);
     }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      margin: 0 0 13px;
-      font-size: 17px;
-      font-weight: 900;
+    .title{
+      display:flex;align-items:center;gap:9px;
+      margin:0 0 10px;
+      font-size:18px;font-weight:900;
     }
-
-    .section-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: var(--primary);
-      box-shadow: 0 0 0 5px var(--primary-soft);
-      flex: 0 0 auto;
+    .dot{
+      width:9px;height:9px;border-radius:50%;
+      background:var(--orange);
+      box-shadow:0 0 0 5px #fff1e7;
+      flex:0 0 auto;
     }
-
-    .hint {
-      margin: -3px 0 13px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
+    .hint{
+      color:var(--muted);
+      font-size:13px;line-height:1.7;
+      margin:0 0 12px;
     }
-
-    .example {
-      background: var(--primary-soft);
-      border: 1px solid #FFD8BF;
-      border-radius: 15px;
-      padding: 12px 13px;
-      margin-bottom: 12px;
-      color: #7C2D12;
-      font-size: 13px;
-      line-height: 1.8;
-      cursor: pointer;
+    .example{
+      background:var(--soft);
+      border:1px solid #ffd4b7;
+      color:#8f3c0c;
+      padding:12px 13px;
+      border-radius:16px;
+      font-size:13px;line-height:1.75;
+      margin-bottom:12px;
+      cursor:pointer;
     }
-
-    textarea {
-      width: 100%;
-      min-height: 112px;
-      resize: vertical;
-      border: 1.5px solid #D0D5DD;
-      border-radius: 16px;
-      padding: 14px;
-      font-size: 15px;
-      line-height: 1.7;
-      color: var(--ink);
-      outline: none;
-      transition: border-color .2s, box-shadow .2s;
+    textarea{
+      width:100%;
+      min-height:116px;
+      resize:vertical;
+      border:1.5px solid #d5dae3;
+      border-radius:18px;
+      padding:15px;
+      font-size:16px;
+      line-height:1.75;
+      color:var(--ink);
+      outline:none;
+      background:#fff;
     }
-
-    textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(230,81,0,.09);
+    textarea:focus{
+      border-color:#f69c60;
+      box-shadow:0 0 0 4px rgba(241,90,0,.08)
     }
-
-    .actions-row {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 11px;
+    .modes{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:8px;
+      margin-top:12px;
     }
-
-    .start-row {
-      margin-top: 10px;
+    .mode{
+      height:52px;
+      border-radius:17px;
+      border:1px solid #f5c6a7;
+      background:#fff3e7;
+      color:#c84f00;
+      font-size:14px;font-weight:900;
+      cursor:pointer;
     }
-
-    .start-row .btn-primary {
-      width: 100%;
-      min-height: 52px;
-      font-size: 16px;
-      border-radius: 16px;
+    .mode.active{
+      background:#fff;
+      border-color:var(--orange);
+      box-shadow:inset 0 0 0 2px rgba(241,90,0,.08)
     }
-
-    .mode-btn {
-      color: var(--primary-dark);
-      background: var(--primary-soft);
-      border: 1px solid #FFD1B5;
+    .mode.calling{background:#15803d;color:#fff;border-color:#15803d}
+    .start{
+      width:100%;height:56px;
+      border:0;border-radius:18px;
+      margin-top:10px;
+      background:linear-gradient(180deg,var(--orange),var(--orange2));
+      color:#fff;
+      font-size:18px;font-weight:900;
+      cursor:pointer;
+      box-shadow:0 10px 22px rgba(241,90,0,.22);
     }
-
-    .mode-btn.active {
-      color: var(--primary-dark);
-      background: #FFF0E4;
-      border-color: #F7B98F;
-      box-shadow: inset 0 0 0 1px rgba(230,81,0,.03);
+    .start:disabled{opacity:.62;cursor:wait}
+    .status{
+      min-height:20px;
+      margin-top:9px;
+      color:var(--muted);
+      font-size:12px;line-height:1.6;
     }
-
-    .btn-call.calling {
-      color: #fff;
-      background: #15803D;
-      border-color: #15803D;
-      box-shadow: 0 7px 16px rgba(21,128,61,.18);
+    .hidden{display:none!important}
+    .notice{
+      border-radius:16px;
+      padding:12px 13px;
+      margin-bottom:13px;
+      font-size:14px;font-weight:900;
+      line-height:1.6;
+      background:var(--success-bg);
+      color:var(--success);
+      border:1px solid #bbf7d0;
     }
-
-    .btn-call.ringing {
-      color: #fff;
-      background: #D97706;
-      border-color: #D97706;
-      box-shadow: 0 7px 16px rgba(217,119,6,.18);
+    .notice.wait{
+      background:var(--warning-bg);
+      color:var(--warning);
+      border-color:#fed7aa;
     }
-
-    .btn {
-      border: 0;
-      border-radius: 15px;
-      padding: 13px 14px;
-      font-size: 14px;
-      font-weight: 900;
-      cursor: pointer;
-      min-height: 48px;
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:9px;
     }
-
-    .btn-primary {
-      color: #fff;
-      background: var(--primary);
-      box-shadow: 0 7px 16px rgba(230,81,0,.20);
+    .info{
+      min-height:78px;
+      background:#fafbfc;
+      border:1px solid var(--line);
+      border-radius:17px;
+      padding:11px;
     }
-
-    .btn-voice {
-      color: var(--primary-dark);
-      background: var(--primary-soft);
-      border: 1px solid #FFD1B5;
+    .info.full{grid-column:1/-1}
+    .label{font-size:11px;color:var(--muted);margin-bottom:6px}
+    .value{
+      font-size:15px;font-weight:900;line-height:1.45;
+      word-break:break-word;
     }
-
-    .btn-voice.listening {
-      color: #fff;
-      background: #B91C1C;
-      border-color: #B91C1C;
+    .offers-head{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      margin-bottom:8px;
     }
-
-    .btn:disabled { opacity: .55; cursor: wait; }
-
-    .voice-status {
-      min-height: 20px;
-      margin-top: 9px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
+    .timer{
+      font-size:12px;font-weight:900;
+      color:#15803d;background:#f0fdf4;
+      border:1px solid #bbf7d0;
+      border-radius:999px;
+      padding:7px 10px;
+      direction:ltr;
     }
-
-    .result-card { display: none; }
-    .result-card.show { display: block; }
-
-    .status-banner {
-      border-radius: 15px;
-      padding: 12px 13px;
-      margin-bottom: 14px;
-      font-size: 14px;
-      font-weight: 800;
-      line-height: 1.7;
+    .offer{
+      display:grid;
+      grid-template-columns:1fr auto;
+      align-items:center;
+      gap:10px;
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:17px;
+      padding:11px 12px;
+      margin-top:10px;
+      animation:offerIn .22s ease-out both;
     }
-
-    .status-ready {
-      background: var(--success-soft);
-      color: var(--success);
-      border: 1px solid #BBF7D0;
+    @keyframes offerIn{
+      from{opacity:0;transform:translateY(8px)}
+      to{opacity:1;transform:translateY(0)}
     }
-
-    .status-wait {
-      background: var(--warning-soft);
-      color: var(--warning);
-      border: 1px solid #FED7AA;
+    .driverline{display:flex;align-items:center;gap:9px}
+    .avatar{
+      width:38px;height:38px;border-radius:50%;
+      background:linear-gradient(145deg,#ffe3cf,#fff6ef);
+      border:1px solid #ffd1b5;
+      color:#b64700;
+      display:grid;place-items:center;
+      font-weight:900;flex:0 0 38px;
     }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: 10px;
+    .drivername{font-weight:900;font-size:14px;margin-bottom:4px}
+    .meta{color:var(--muted);font-size:11px;line-height:1.5}
+    .price{text-align:center;font-size:18px;font-weight:900;color:#b83d00;margin-bottom:7px}
+    .choose{
+      border:0;border-radius:12px;
+      padding:9px 11px;
+      background:var(--orange);
+      color:#fff;font-weight:900;cursor:pointer;
     }
-
-    .summary-item {
-      background: #FAFAFB;
-      border: 1px solid var(--line);
-      border-radius: 15px;
-      padding: 11px;
-      min-height: 72px;
+    .accepted{
+      margin-top:11px;padding:12px 13px;
+      border-radius:15px;
+      background:var(--success-bg);
+      color:var(--success);
+      border:1px solid #bbf7d0;
+      font-weight:900;font-size:13px;
     }
-
-    .summary-item span {
-      display: block;
-      font-size: 11px;
-      color: var(--muted);
-      margin-bottom: 6px;
+    .footer{
+      text-align:center;
+      color:#98a2b3;
+      font-size:11px;
+      padding:4px 12px 0;
     }
-
-    .summary-item strong {
-      display: block;
-      font-size: 14px;
-      line-height: 1.5;
-      word-break: break-word;
+    .call-overlay{
+      position:fixed;inset:0;z-index:99;
+      display:grid;place-items:center;
+      background:rgba(17,24,39,.56);
+      backdrop-filter:blur(5px);
+      padding:20px;
     }
-
-    .flow {
-      display: none;
-      margin-top: 15px;
-      flex-wrap: wrap;
-      gap: 7px;
+    .callbox{
+      width:min(350px,92vw);
+      background:#fff;
+      border-radius:28px;
+      padding:24px 20px;
+      text-align:center;
+      box-shadow:0 28px 70px rgba(0,0,0,.25);
     }
-
-    .flow-step {
-      background: #F2F4F7;
-      color: #344054;
-      border-radius: 999px;
-      padding: 7px 10px;
-      font-size: 11px;
-      font-weight: 700;
+    .phoneicon{
+      width:82px;height:82px;border-radius:50%;
+      display:grid;place-items:center;
+      margin:0 auto 14px;
+      background:#fff1e6;color:var(--orange);
+      font-size:35px;
+      border:1px solid #ffd5b7;
     }
-
-    .bidding-card {
-      display: none;
+    .calltitle{font-size:23px;font-weight:900;margin-bottom:7px}
+    .callstatus{color:var(--muted);font-size:14px;min-height:22px}
+    .endcall{
+      margin-top:18px;
+      min-width:145px;height:48px;
+      border:0;border-radius:17px;
+      background:#b91c1c;color:#fff;
+      font-weight:900;cursor:pointer;
     }
-
-    .bidding-card.show {
-      display: block;
+    @media(max-width:520px){
+      body{background:#f7f8fa}
+      .phone{width:100vw;box-shadow:none}
+      .hero{padding-inline:16px}
+      .content{padding-inline:10px}
+      .mode{font-size:12px;padding-inline:5px}
     }
-
-    .bidding-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .timer {
-      font-size: 12px;
-      font-weight: 900;
-      color: #15803D;
-      background: #F0FDF4;
-      border: 1px solid #BBF7D0;
-      border-radius: 999px;
-      padding: 6px 10px;
-    }
-
-    .offers-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .offer-card {
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 11px 12px;
-      background: #fff;
-      display: none;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: center;
-      animation: offerIn .25s ease-out;
-    }
-
-    .offer-card.show { display: grid; }
-
-    @keyframes offerIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .driver-line {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-    }
-
-    .driver-avatar {
-      width: 38px;
-      height: 38px;
-      flex: 0 0 38px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(145deg, #FFE1CC, #FFF5ED);
-      border: 1px solid #FFD1B5;
-      color: var(--primary-dark);
-      font-weight: 900;
-      font-size: 13px;
-    }
-
-    .offer-driver {
-      font-weight: 900;
-      margin-bottom: 5px;
-    }
-
-    .offer-meta {
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.6;
-    }
-
-    .offer-price {
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--primary-dark);
-      margin-bottom: 8px;
-      text-align: center;
-    }
-
-    .accept-btn {
-      border: 0;
-      border-radius: 12px;
-      padding: 9px 12px;
-      font-weight: 900;
-      cursor: pointer;
-      color: #fff;
-      background: var(--primary);
-    }
-
-    .accepted-box {
-      display: none;
-      margin-top: 12px;
-      border-radius: 15px;
-      padding: 13px;
-      background: var(--success-soft);
-      color: var(--success);
-      border: 1px solid #BBF7D0;
-      font-weight: 900;
-      line-height: 1.7;
-    }
-
-    .accepted-box.show { display: block; }
-
-    .footer-note {
-      text-align: center;
-      color: #98A2B3;
-      font-size: 11px;
-      padding: 5px 14px 0;
-    }
-
-    @media (max-width: 520px) {
-      body { background: #F4F6F8; }
-      .app-shell { width: 100vw; box-shadow: none; }
-      .actions-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-      .actions-row .btn { padding-inline: 6px; font-size: 12px; }
-      .summary-grid { grid-template-columns: 1fr 1fr; }
-      .hero { padding-inline: 16px; }
-      .content { padding-inline: 11px; }
-    }
-
-    @media (min-width: 521px) {
-      body { padding: 18px 0; }
-      .app-shell { border-radius: 30px; min-height: calc(100vh - 36px); }
-      .hero { border-radius: 30px 30px 28px 28px; }
+    @media(min-width:521px){
+      body{padding:18px 0}
+      .phone{border-radius:30px;min-height:calc(100vh - 36px)}
+      .hero{border-radius:30px 30px 28px 28px}
     }
   </style>
 </head>
 <body>
-  <main class="app-shell">
+  <main class="phone">
     <header class="hero">
-      <div class="status-bar" aria-hidden="true">
+      <div class="statusbar" aria-hidden="true">
         <span>9:41</span>
-        <span class="status-icons"><span>▮▮▮</span><span>⌁</span><span>▱</span></span>
+        <span class="statusicons"><span>▮▮▮</span><span>⌁</span><span>▱</span></span>
       </div>
       <div class="topbar">
-        <div class="brand" aria-label="عالسكة 3ASEKKA">عالسكة<small>3ASEKKA</small></div>
-        <button id="langBtn" class="lang-btn" type="button">EN</button>
+        <button id="langBtn" class="lang" type="button">EN</button>
+        <div class="logo-wrap">
+          <img id="mainLogo" src="/assets/images/logo_icon/logo.png" alt="عالسكة" />
+        </div>
       </div>
       <h1 id="heroTitle">اطلب… ونحجز لك نقلتك فورًا</h1>
-      <p id="heroSub">اكتب طلبك أو قوله بصوتك، وعالسكة تجهّز تفاصيل النقلة وتحدد الخطوة التالية.</p>
+      <p id="heroSub">اكتب طلبك أو قوله بصوتك، وعالسكة تجهز تفاصيل النقلة وتحدد الخطوة التالية.</p>
     </header>
 
     <section class="content">
       <div class="card">
-        <h2 class="section-title">
-          <span class="section-dot"></span>
-          <span id="requestTitle">نقلة جديدة</span>
-        </h2>
-        <p class="hint" id="requestHint">قول لنا هتنقل إيه، منين لفين، والوزن التقريبي.</p>
-
-        <div class="example" id="example">
-          مثال: عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو.
-        </div>
-
+        <h2 class="title"><span class="dot"></span><span id="requestTitle">نقلة جديدة</span></h2>
+        <p id="requestHint" class="hint">قول لنا هتنقل إيه، منين لفين، والوزن التقريبي.</p>
+        <div id="example" class="example">مثال: عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو والمسافة 12 كم.</div>
         <textarea id="input" placeholder="اكتب طلب النقل هنا..."></textarea>
 
-        <div class="actions-row">
-          <button id="chat" class="btn mode-btn active" type="button">💬 شات</button>
-          <button id="voice" class="btn mode-btn btn-voice" type="button">🎤 فويس</button>
-          <button id="call" class="btn mode-btn btn-call" type="button">📞 اتصل</button>
+        <div class="modes">
+          <button id="chat" class="mode active" type="button">💬 شات</button>
+          <button id="voice" class="mode" type="button">🎤 فويس</button>
+          <button id="call" class="mode" type="button">📞 اتصل</button>
         </div>
 
-        <div class="start-row">
-          <button id="run" class="btn btn-primary" type="button">ابدأ نقلتك</button>
+        <button id="run" class="start" type="button">ابدأ نقلتك</button>
+        <div id="status" class="status">تقدر تكتب أو تتكلم باللهجة المصرية.</div>
+      </div>
+
+      <div id="resultCard" class="card hidden">
+        <h2 class="title"><span class="dot"></span><span id="resultTitle">النتيجة</span></h2>
+        <div id="notice" class="notice"></div>
+        <div id="summary" class="grid"></div>
+      </div>
+
+      <div id="offersCard" class="card hidden">
+        <div class="offers-head">
+          <span id="timer" class="timer">00:15</span>
+          <h2 class="title" style="margin:0"><span class="dot"></span><span id="offersTitle">عروض السائقين</span></h2>
         </div>
-
-        <div id="voiceStatus" class="voice-status">تقدر تكتب أو تتكلم باللهجة المصرية.</div>
+        <p id="offersHint" class="hint">بنستقبل عروض السائقين المناسبين لنقلتك...</p>
+        <div id="offers"></div>
+        <div id="accepted" class="accepted hidden"></div>
       </div>
 
-      <div id="resultCard" class="card result-card">
-        <h2 class="section-title">
-          <span class="section-dot"></span>
-          <span id="summaryTitle">النتيجة</span>
-        </h2>
-
-        <div id="statusBanner" class="status-banner status-ready"></div>
-        <div id="summary" class="summary-grid"></div>
-        <div id="flow" class="flow"></div>
-      </div>
-
-      <div id="biddingCard" class="card bidding-card">
-        <div class="bidding-head">
-          <h2 class="section-title" style="margin:0">
-            <span class="section-dot"></span>
-            <span id="biddingTitle">عروض السائقين</span>
-          </h2>
-          <span id="offerTimer" class="timer">00:15</span>
-        </div>
-        <p id="biddingHint" class="hint">بنستقبل عروض السائقين المناسبين لنقلتك...</p>
-        <div id="offersList" class="offers-list"></div>
-        <div id="acceptedBox" class="accepted-box"></div>
-      </div>
-
-      <div class="footer-note" id="footerNote">عالسكة — نقل بضائع وحمولات بسهولة.</div>
+      <div id="footer" class="footer">عالسكة — نقل بضائع وحمولات بسهولة.</div>
     </section>
   </main>
 
-  <script src="./browser-fallback.js"></script>
+  <div id="callOverlay" class="call-overlay hidden">
+    <div class="callbox">
+      <div class="phoneicon">📞</div>
+      <div id="callTitle" class="calltitle">عالسكة</div>
+      <div id="callStatus" class="callstatus">جاري الاتصال...</div>
+      <button id="endCall" class="endcall" type="button">إنهاء المكالمة</button>
+    </div>
+  </div>
+
   <script>
-    const dict = {
-      ar: {
-        dir: "rtl",
-        langButton: "EN",
-        heroTitle: "اطلب… ونحجز لك نقلتك فورًا",
-        heroSub: "اكتب طلبك أو قوله بصوتك، وعالسكة تجهّز تفاصيل النقلة وتحدد الخطوة التالية.",
-        requestTitle: "نقلة جديدة",
-        requestHint: "قول لنا هتنقل إيه، منين لفين، والوزن التقريبي.",
-        example: "مثال: عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو.",
-        placeholder: "اكتب طلب النقل هنا...",
-        run: "ابدأ نقلتك",
-        chat: "💬 شات",
-        voice: "🎤 فويس",
-        call: "📞 اتصل",
-        stop: "⏹️ إيقاف",
-        ringing: "📞 جاري الاتصال...",
-        endCall: "⏹️ إنهاء المكالمة",
-        ringingStatus: "بيرن على عالسكة...",
-        connectedStatus: "✓ تم الاتصال بعالسكة.",
-        callListening: "📞 المكالمة شغالة... اتكلم بطبيعتك.",
-        callThinking: "عالسكة بيفهم طلبك...",
-        callReady: "المكالمة جاهزة. اتكلم تاني أو اضغط إنهاء المكالمة.",
-        voiceIdle: "تقدر تكتب أو تتكلم باللهجة المصرية.",
-        listening: "🎙️ سامعك... اتكلم بطبيعتك.",
-        captured: "تمام، استلمنا طلبك وبنجهزه دلوقتي...",
-        noSpeech: "مسمعناش طلب واضح. جرّب مرة تانية.",
-        permission: "اسمح باستخدام الميكروفون من المتصفح علشان تقدر تتكلم.",
-        micError: "حصلت مشكلة في الميكروفون. جرّب مرة تانية.",
-        preparing: "بنجهز نقلتك...",
-        empty: "اكتب أو قول طلب النقل الأول.",
-        summaryTitle: "النتيجة",
-        ready: "✓ تم فهم طلبك وتجهيز تفاصيل النقلة.",
-        routing: "✓ تم فهم طلبك. بنحسب مسافة الطريق والسعر علشان نكمل الحجز.",
-        needInfo: "فهمنا طلبك، ومحتاجين معلومة واحدة بس علشان نكمّل:",
-        pickup: "الاستلام",
-        destination: "التسليم",
-        cargo: "الحمولة",
-        weight: "الوزن",
-        vehicle: "العربية المناسبة",
-        distance: "المسافة",
-        fare: "السعر التقديري",
-        unknown: "—",
-        km: "كم",
-        kg: "كجم",
-        calculating: "يتم الحساب",
-        flowExtract: "فهم الطلب",
-        flowVehicle: "اختيار العربية",
-        flowRoute: "حساب الطريق",
-        flowFare: "تقدير السعر",
-        flowPrepare: "تجهيز النقلة",
-        flowBids: "استقبال العروض",
-        biddingTitle: "عروض السائقين",
-        biddingHint: "بنستقبل عروض السائقين المناسبين لنقلتك...",
-        offerArrived: "وصل عرض جديد",
-        driver: "السائق",
-        rating: "التقييم",
-        trips: "رحلة مكتملة",
-        choose: "اختار العرض",
-        accepted: "✓ تم اختيار العرض. السائق",
-        acceptedTail: "تم حجزه لنقلتك.",
-        footer: "عالسكة — نقل بضائع وحمولات بسهولة."
+    const dict={
+      ar:{
+        dir:"rtl",lang:"EN",
+        heroTitle:"اطلب… ونحجز لك نقلتك فورًا",
+        heroSub:"اكتب طلبك أو قوله بصوتك، وعالسكة تجهز تفاصيل النقلة وتحدد الخطوة التالية.",
+        requestTitle:"نقلة جديدة",
+        requestHint:"قول لنا هتنقل إيه، منين لفين، والوزن التقريبي.",
+        example:"مثال: عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو والمسافة 12 كم.",
+        placeholder:"اكتب طلب النقل هنا...",
+        chat:"💬 شات",voice:"🎤 فويس",call:"📞 اتصل",
+        run:"ابدأ نقلتك",
+        idle:"تقدر تكتب أو تتكلم باللهجة المصرية.",
+        listening:"🎙️ سامعك... اتكلم بطبيعتك.",
+        preparing:"بنجهز نقلتك...",
+        empty:"اكتب أو قول طلب النقل الأول.",
+        failed:"حصلت مشكلة في تجهيز النقلة. جرّب مرة تانية.",
+        resultTitle:"النتيجة",
+        ready:"✓ تم فهم طلبك وتجهيز تفاصيل النقلة.",
+        need:"فهمنا طلبك ولسه محتاجين معلومة علشان نكمل.",
+        pickup:"الاستلام",destination:"التسليم",cargo:"الحمولة",weight:"الوزن",
+        vehicle:"العربية المناسبة",distance:"المسافة",fare:"السعر التقديري",
+        offersTitle:"عروض السائقين",
+        offersHint:"بنستقبل عروض السائقين المناسبين لنقلتك...",
+        offerArrived:"وصل عرض جديد",
+        driver:"السائق",rating:"التقييم",trips:"رحلة مكتملة",choose:"اختار العرض",
+        accepted:"✓ تم اختيار العرض",
+        callTitle:"عالسكة",ringing:"جاري الاتصال...",connected:"✓ تم الاتصال — اتكلم بطبيعتك.",
+        ending:"تم إنهاء المكالمة.",endCall:"إنهاء المكالمة",
+        footer:"عالسكة — نقل بضائع وحمولات بسهولة.",
+        kg:"كجم",km:"كم"
       },
-      en: {
-        dir: "ltr",
-        langButton: "AR",
-        heroTitle: "Request it… and book your transport instantly",
-        heroSub: "Type or say your request and 3ASEKKA prepares the transport details and the next step.",
-        requestTitle: "New Transport",
-        requestHint: "Tell us what you are moving, pickup, destination, and approximate weight.",
-        example: "Example: I need to move 20 boxes from Smouha to Mansheya tomorrow at 3 PM, around 250 kg.",
-        placeholder: "Type your transport request here...",
-        run: "Start Transport",
-        chat: "💬 Chat",
-        voice: "🎤 Voice",
-        call: "📞 Call",
-        stop: "⏹️ Stop",
-        ringing: "📞 Calling...",
-        endCall: "⏹️ End Call",
-        ringingStatus: "Ringing 3ASEKKA...",
-        connectedStatus: "✓ Connected to 3ASEKKA.",
-        callListening: "📞 Call is live... speak naturally.",
-        callThinking: "3ASEKKA is understanding your request...",
-        callReady: "Call is ready. Speak again or end the call.",
-        voiceIdle: "You can type or speak your request.",
-        listening: "🎙️ Listening... speak naturally.",
-        captured: "Got it. Preparing your request now...",
-        noSpeech: "No clear request was captured. Please try again.",
-        permission: "Allow microphone access in your browser to use voice requests.",
-        micError: "There was a microphone problem. Please try again.",
-        preparing: "Preparing your transport...",
-        empty: "Type or speak your transport request first.",
-        summaryTitle: "Result",
-        ready: "✓ Your request is understood and the transport details are ready.",
-        routing: "✓ Your request is understood. We are calculating route distance and fare to continue booking.",
-        needInfo: "We understood your request and only need one more detail to continue:",
-        pickup: "Pickup",
-        destination: "Destination",
-        cargo: "Cargo",
-        weight: "Weight",
-        vehicle: "Suggested Vehicle",
-        distance: "Distance",
-        fare: "Estimated Fare",
-        unknown: "—",
-        km: "km",
-        kg: "kg",
-        calculating: "Calculating",
-        flowExtract: "Understand request",
-        flowVehicle: "Choose vehicle",
-        flowRoute: "Calculate route",
-        flowFare: "Estimate fare",
-        flowPrepare: "Prepare transport",
-        flowBids: "Receive offers",
-        biddingTitle: "Driver Offers",
-        biddingHint: "Receiving offers from suitable drivers...",
-        offerArrived: "New offer received",
-        driver: "Driver",
-        rating: "Rating",
-        trips: "completed trips",
-        choose: "Choose offer",
-        accepted: "✓ Offer selected. Driver",
-        acceptedTail: "is booked for your transport.",
-        footer: "3ASEKKA — goods transport made simple."
+      en:{
+        dir:"ltr",lang:"AR",
+        heroTitle:"Request it… and book your transport instantly",
+        heroSub:"Type or say your request and 3ASEKKA prepares the transport details and the next step.",
+        requestTitle:"New Transport",
+        requestHint:"Tell us what you are moving, pickup, destination, and approximate weight.",
+        example:"Example: I need to move 20 boxes from Smouha to Mansheya tomorrow at 3 PM, around 250 kg, distance 12 km.",
+        placeholder:"Type your transport request here...",
+        chat:"💬 Chat",voice:"🎤 Voice",call:"📞 Call",
+        run:"Start Transport",
+        idle:"You can type or speak your request.",
+        listening:"🎙️ Listening... speak naturally.",
+        preparing:"Preparing your transport...",
+        empty:"Type or speak your transport request first.",
+        failed:"Could not prepare the transport request. Please try again.",
+        resultTitle:"Result",
+        ready:"✓ Your request is understood and the transport details are ready.",
+        need:"We understood your request and need one more detail to continue.",
+        pickup:"Pickup",destination:"Destination",cargo:"Cargo",weight:"Weight",
+        vehicle:"Suggested Vehicle",distance:"Distance",fare:"Estimated Fare",
+        offersTitle:"Driver Offers",
+        offersHint:"Receiving offers from suitable drivers...",
+        offerArrived:"New offer received",
+        driver:"Driver",rating:"Rating",trips:"completed trips",choose:"Choose offer",
+        accepted:"✓ Offer selected",
+        callTitle:"3ASEKKA",ringing:"Calling...",connected:"✓ Connected — speak naturally.",
+        ending:"Call ended.",endCall:"End Call",
+        footer:"3ASEKKA — goods transport made simple.",
+        kg:"kg",km:"km"
       }
     };
 
-    let uiLang = "ar";
-    const el = (id) => document.getElementById(id);
-    const input = el("input");
-    const run = el("run");
-    const chat = el("chat");
-    const voice = el("voice");
-    const call = el("call");
-    const voiceStatus = el("voiceStatus");
-    const resultCard = el("resultCard");
-    const summary = el("summary");
-    const flow = el("flow");
-    const statusBanner = el("statusBanner");
-    const langBtn = el("langBtn");
-    const biddingCard = el("biddingCard");
-    const offersList = el("offersList");
-    const offerTimer = el("offerTimer");
-    const acceptedBox = el("acceptedBox");
-    const isLocalServer = ["localhost", "127.0.0.1"].includes(location.hostname);
-    const isHostedAgent = location.pathname.startsWith("/ai/") || location.pathname.startsWith("/ai-agent/") || location.pathname.startsWith("/agent/");
-    const hasServerApi = isLocalServer || isHostedAgent;
-    let serverAvailable = hasServerApi;
-    let lastData = null;
+    let uiLang="ar";
+    let recognition=null;
+    let listening=false;
+    let callMode=false;
+    let callSession=0;
+    let audioCtx=null;
+    let offerTimers=[];
+    let countdown=null;
+    let lastData=null;
 
-    function t(key) { return dict[uiLang][key]; }
+    const el=id=>document.getElementById(id);
+    const t=k=>dict[uiLang][k];
 
-    function applyLanguage() {
-      document.documentElement.lang = uiLang;
-      document.documentElement.dir = t("dir");
-      langBtn.textContent = t("langButton");
-      el("heroTitle").textContent = t("heroTitle");
-      el("heroSub").textContent = t("heroSub");
-      el("requestTitle").textContent = t("requestTitle");
-      el("requestHint").textContent = t("requestHint");
-      el("example").textContent = t("example");
-      input.placeholder = t("placeholder");
-      run.textContent = t("run");
-      chat.textContent = t("chat");
-      voice.textContent = listening && !callMode ? t("stop") : t("voice");
-      call.textContent = callRinging ? t("ringing") : (callMode ? t("endCall") : t("call"));
-      voiceStatus.textContent = t("voiceIdle");
-      el("summaryTitle").textContent = t("summaryTitle");
-      el("biddingTitle").textContent = t("biddingTitle");
-      el("biddingHint").textContent = t("biddingHint");
-      el("footerNote").textContent = t("footer");
-      if (recognition) recognition.lang = uiLang === "ar" ? "ar-EG" : "en-US";
-      if (lastData) render(lastData);
-    }
-
-    function setMode(mode) {
-      chat.classList.toggle("active", mode === "chat");
-      voice.classList.toggle("active", mode === "voice");
-      call.classList.toggle("active", mode === "call");
-      input.focus();
-    }
-
-    chat.addEventListener("click", () => {
-      if (callMode || callRinging) stopCallMode();
-      if (listening && recognition) recognition.stop();
-      setMode("chat");
-      voiceStatus.textContent = t("voiceIdle");
+    el("mainLogo").addEventListener("error",()=>{
+      el("mainLogo").src="/assets/images/logo_icon/logo_main_1024.png";
     });
 
-    langBtn.addEventListener("click", () => {
-      uiLang = uiLang === "ar" ? "en" : "ar";
-      applyLanguage();
-    });
-
-    el("example").addEventListener("click", () => {
-      input.value = uiLang === "ar"
-        ? "عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو والمسافة 12 كم"
-        : "I need to move 20 boxes from Smouha to Mansheya tomorrow at 3 PM, around 250 kg, distance 12 km";
-      input.focus();
-    });
-
-    function summaryItem(label, value) {
-      const box = document.createElement("div");
-      box.className = "summary-item";
-      const s = document.createElement("span");
-      s.textContent = label;
-      const strong = document.createElement("strong");
-      strong.textContent = value ?? t("unknown");
-      box.append(s, strong);
-      return box;
+    function applyLanguage(){
+      document.documentElement.lang=uiLang;
+      document.documentElement.dir=t("dir");
+      el("langBtn").textContent=t("lang");
+      el("heroTitle").textContent=t("heroTitle");
+      el("heroSub").textContent=t("heroSub");
+      el("requestTitle").textContent=t("requestTitle");
+      el("requestHint").textContent=t("requestHint");
+      el("example").textContent=t("example");
+      el("input").placeholder=t("placeholder");
+      el("chat").textContent=t("chat");
+      el("voice").textContent=t("voice");
+      el("call").textContent=t("call");
+      el("run").textContent=t("run");
+      el("resultTitle").textContent=t("resultTitle");
+      el("offersTitle").textContent=t("offersTitle");
+      el("offersHint").textContent=t("offersHint");
+      el("status").textContent=t("idle");
+      el("callTitle").textContent=t("callTitle");
+      el("endCall").textContent=t("endCall");
+      el("footer").textContent=t("footer");
+      if(recognition) recognition.lang=uiLang==="ar"?"ar-EG":"en-US";
+      if(lastData) render(lastData,false);
     }
 
-    function friendlyFlow(actions = []) {
-      const keys = [];
-      for (const a of actions) {
-        if (a.tool === "extract_transport_request") keys.push("flowExtract");
-        if (a.tool === "recommend_vehicle") keys.push("flowVehicle");
-        if (a.tool === "calculate_route") keys.push("flowRoute");
-        if (a.tool === "estimate_fare") keys.push("flowFare");
-        if (a.tool === "prepare_transport_request") keys.push("flowPrepare");
-        if (a.tool === "driver_matching_and_bidding") keys.push("flowBids");
-      }
-      return [...new Set(keys)];
+    function setMode(mode){
+      for(const id of ["chat","voice","call"]) el(id).classList.toggle("active",id===mode);
+      if(mode!=="call") el("call").classList.remove("calling");
     }
 
-    let offerRevealTimers = [];
-    let countdownTimer = null;
-
-    function clearBiddingTimers() {
-      offerRevealTimers.forEach(clearTimeout);
-      offerRevealTimers = [];
-      if (countdownTimer) clearInterval(countdownTimer);
-      countdownTimer = null;
+    function info(label,value,full=false){
+      const d=document.createElement("div");
+      d.className="info"+(full?" full":"");
+      const l=document.createElement("div"); l.className="label"; l.textContent=label;
+      const v=document.createElement("div"); v.className="value"; v.textContent=value??"—";
+      d.append(l,v); return d;
     }
 
-    function chooseOffer(offer) {
-      acceptedBox.classList.add("show");
-      acceptedBox.textContent =
-        t("accepted") + " " + (offer.driverName || "—") + " — " + offer.amount + " EGP. " + t("acceptedTail");
-
-      offersList.querySelectorAll(".accept-btn").forEach(btn => {
-        btn.disabled = true;
-        btn.style.opacity = ".5";
-      });
+    function vehicleName(rec){
+      if(!rec) return "—";
+      if(uiLang==="ar") return rec.vehicleNameAr||"—";
+      const map={motorbike:"Motorbike",tricycle:"Tricycle",van:"Van",quarter_pickup:"Quarter Pickup",needs_review:"Needs review"};
+      return map[rec.vehicleId]||rec.vehicleNameAr||"—";
     }
 
-    function startBidding(offers = []) {
-      clearBiddingTimers();
-      acceptedBox.classList.remove("show");
-      acceptedBox.textContent = "";
-      offersList.replaceChildren();
+    function clearOfferTimers(){
+      offerTimers.forEach(clearTimeout); offerTimers=[];
+      if(countdown) clearInterval(countdown);
+      countdown=null;
+    }
 
-      if (!offers.length) {
-        biddingCard.classList.remove("show");
+    function renderOffers(offers){
+      clearOfferTimers();
+      const box=el("offers");
+      box.replaceChildren();
+      el("accepted").classList.add("hidden");
+      el("accepted").textContent="";
+
+      if(!offers.length){
+        el("offersCard").classList.add("hidden");
         return;
       }
 
-      biddingCard.classList.add("show");
-      let remaining = 15;
-      offerTimer.textContent = "00:" + String(remaining).padStart(2, "0");
-      countdownTimer = setInterval(() => {
-        remaining = Math.max(0, remaining - 1);
-        offerTimer.textContent = "00:" + String(remaining).padStart(2, "0");
-        if (remaining === 0) {
-          clearInterval(countdownTimer);
-          countdownTimer = null;
-        }
-      }, 1000);
+      el("offersCard").classList.remove("hidden");
+      let remaining=15;
+      el("timer").textContent="00:15";
+      countdown=setInterval(()=>{
+        remaining=Math.max(0,remaining-1);
+        el("timer").textContent="00:"+String(remaining).padStart(2,"0");
+        if(remaining===0){clearInterval(countdown);countdown=null;}
+      },1000);
 
-      offers.forEach((offer, index) => {
-        const card = document.createElement("div");
-        card.className = "offer-card";
+      offers.forEach((offer,index)=>{
+        const card=document.createElement("div");
+        card.className="offer";
+        card.style.opacity="0";
+        card.style.transform="translateY(8px)";
 
-        const left = document.createElement("div");
-        const driverLine = document.createElement("div");
-        driverLine.className = "driver-line";
+        const left=document.createElement("div");
+        const line=document.createElement("div"); line.className="driverline";
+        const avatar=document.createElement("div"); avatar.className="avatar";
+        avatar.textContent=(offer.driverName||String(index+1)).trim().slice(0,1);
+        const txt=document.createElement("div");
+        const name=document.createElement("div"); name.className="drivername";
+        name.textContent=t("driver")+": "+(offer.driverName||("#"+(index+1)));
+        const meta=document.createElement("div"); meta.className="meta";
+        meta.textContent=t("rating")+": "+(offer.rating??"—")+" ★ · "+(offer.completedTrips??"—")+" "+t("trips");
+        txt.append(name,meta); line.append(avatar,txt); left.append(line);
 
-        const avatar = document.createElement("div");
-        avatar.className = "driver-avatar";
-        const displayName = offer.driverName || ("#" + (index + 1));
-        avatar.textContent = String(displayName).trim().slice(0, 1);
+        const right=document.createElement("div");
+        const price=document.createElement("div"); price.className="price";
+        price.textContent=(offer.amount??"—")+" EGP";
+        const choose=document.createElement("button"); choose.className="choose"; choose.textContent=t("choose");
+        choose.addEventListener("click",()=>{
+          el("accepted").classList.remove("hidden");
+          el("accepted").textContent=t("accepted")+": "+(offer.driverName||"—")+" — "+(offer.amount??"—")+" EGP";
+          box.querySelectorAll("button").forEach(b=>b.disabled=true);
+        });
+        right.append(price,choose); card.append(left,right); box.append(card);
 
-        const driverText = document.createElement("div");
-        const driver = document.createElement("div");
-        driver.className = "offer-driver";
-        driver.textContent = t("driver") + ": " + displayName;
-
-        const meta = document.createElement("div");
-        meta.className = "offer-meta";
-        meta.textContent =
-          t("rating") + ": " + (offer.rating ?? "—") + " ★ · " +
-          (offer.completedTrips ?? "—") + " " + t("trips");
-
-        driverText.append(driver, meta);
-        driverLine.append(avatar, driverText);
-        left.append(driverLine);
-
-        const right = document.createElement("div");
-        const price = document.createElement("div");
-        price.className = "offer-price";
-        price.textContent = offer.amount + " EGP";
-
-        const button = document.createElement("button");
-        button.className = "accept-btn";
-        button.textContent = t("choose");
-        button.addEventListener("click", () => chooseOffer(offer));
-
-        right.append(price, button);
-        card.append(left, right);
-        offersList.appendChild(card);
-
-        offerRevealTimers.push(setTimeout(() => {
-          card.classList.add("show");
-          el("biddingHint").textContent = t("offerArrived") + " " + (index + 1) + "/" + offers.length;
-          if (index === 0) {
-            biddingCard.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        }, 900 + index * 1200));
+        offerTimers.push(setTimeout(()=>{
+          card.style.opacity="1"; card.style.transform="translateY(0)";
+          el("offersHint").textContent=t("offerArrived")+" "+(index+1)+"/"+offers.length;
+          if(index===0) el("offersCard").scrollIntoView({behavior:"smooth",block:"start"});
+        },650+index*950));
       });
     }
 
-    function vehicleLabel(recommendation) {
-      if (!recommendation) return null;
-      if (uiLang === "ar") return recommendation.vehicleNameAr;
-      const names = {
-        motorbike: "Motorbike",
-        tricycle: "Tricycle",
-        van: "Van",
-        quarter_pickup: "Quarter Pickup",
-        needs_review: "Needs load review"
-      };
-      return names[recommendation.vehicleId] || recommendation.vehicleNameAr;
-    }
+    function render(data,scroll=true){
+      lastData=data;
+      const req=data.request||{};
+      const rec=data.recommendation||{};
+      const route=data.route||{};
+      const pricing=data.pricing||{};
+      const missing=Array.isArray(data.missing)?data.missing:[];
+      const needs=data.status==="needs_information";
 
-    function render(data) {
-      lastData = data;
-      resultCard.classList.add("show");
+      el("resultCard").classList.remove("hidden");
+      el("notice").className="notice"+(needs?" wait":"");
+      el("notice").textContent=needs
+        ? (data.followUpQuestionAr||t("need"))
+        : t("ready");
 
-      const needInfo = data.status === "needs_information";
-      statusBanner.className = "status-banner " + (needInfo ? "status-wait" : "status-ready");
-      statusBanner.textContent = needInfo
-        ? t("needInfo") + " " + (data.followUpQuestionAr || "")
-        : (data.status === "ready_for_routing" ? t("routing") : t("ready"));
-
-      summary.replaceChildren(
-        summaryItem(t("pickup"), data.request?.pickup),
-        summaryItem(t("destination"), data.request?.destination),
-        summaryItem(t("cargo"), data.request?.cargo),
-        summaryItem(t("weight"), data.request?.weightKg != null ? data.request.weightKg + " " + t("kg") : null),
-        summaryItem(t("vehicle"), vehicleLabel(data.recommendation)),
-        summaryItem(t("distance"), data.route?.distanceKm != null ? data.route.distanceKm + " " + t("km") : t("calculating")),
-        summaryItem(t("fare"), data.pricing?.estimatedFare != null ? data.pricing.estimatedFare + " EGP" : t("calculating"))
+      el("summary").replaceChildren(
+        info(t("pickup"),req.pickup||"—"),
+        info(t("destination"),req.destination||"—"),
+        info(t("cargo"),req.cargo||"—"),
+        info(t("weight"),req.weightKg!=null?req.weightKg+" "+t("kg"):"—"),
+        info(t("distance"),route.distanceKm!=null?route.distanceKm+" "+t("km"):"—"),
+        info(t("vehicle"),vehicleName(rec)),
+        info(t("fare"),pricing.estimatedFare!=null?pricing.estimatedFare+" EGP":"—",true)
       );
 
-      flow.replaceChildren();
-      for (const key of friendlyFlow(data.actions)) {
-        const chip = document.createElement("span");
-        chip.className = "flow-step";
-        chip.textContent = t(key);
-        flow.appendChild(chip);
-      }
-
-      startBidding(data.offers || []);
-      resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      renderOffers(data.offers||[]);
+      if(scroll) el("resultCard").scrollIntoView({behavior:"smooth",block:"start"});
     }
 
-    async function submitAgentRequest(options = {}) {
-      const text = input.value.trim();
-      if (!text) {
-        voiceStatus.textContent = t("empty");
-        input.focus();
-        return;
-      }
+    async function submitAgent({speak=false}={}){
+      const text=el("input").value.trim();
+      if(!text){el("status").textContent=t("empty");return null;}
 
-      run.disabled = true;
-      voice.disabled = true;
-      voiceStatus.textContent = t("preparing");
+      el("run").disabled=true;
+      el("status").textContent=t("preparing");
 
-      try {
-        let data;
-        if (serverAvailable) {
-          const response = await fetch("api/agent", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ input: text })
-          });
-          if (!response.ok) throw new Error(await response.text());
-          data = await response.json();
-        } else {
-          data = window.run3AsekkaBrowserFallback(text);
-        }
-        render(data);
-        if (options.speakReply) await speakAgentReply(data);
-        voiceStatus.textContent = callMode ? t("callReady") : t("voiceIdle");
+      try{
+        const controller=new AbortController();
+        const timeout=setTimeout(()=>controller.abort(),30000);
+        const res=await fetch("/agent/api/agent",{
+          method:"POST",
+          headers:{"content-type":"application/json"},
+          body:JSON.stringify({input:text}),
+          signal:controller.signal
+        });
+        clearTimeout(timeout);
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        const data=await res.json();
+        render(data,true);
+        el("status").textContent=t("idle");
+        if(speak) await speakReply(data);
         return data;
-      } catch (error) {
-        if (!hasServerApi) {
-          serverAvailable = false;
-          render(window.run3AsekkaBrowserFallback(text));
-          voiceStatus.textContent = t("voiceIdle");
-        } else {
-          voiceStatus.textContent = uiLang === "ar"
-            ? "تعذر الاتصال بالـAI على السيرفر. جرّب مرة أخرى."
-            : "Could not reach the AI server. Please try again.";
-          console.error(error);
-        }
-      } finally {
-        run.disabled = false;
-        voice.disabled = false;
+      }catch(err){
+        console.error(err);
+        el("status").textContent=t("failed");
+        return null;
+      }finally{
+        el("run").disabled=false;
       }
     }
 
-    run.addEventListener("click", () => submitAgentRequest());
-
-    let callMode = false;
-    let callRinging = false;
-    let callRestartTimer = null;
-    let callConversationText = "";
-    let callSessionId = 0;
-    let audioContext = null;
-
-    function getAudioContext() {
-      if (audioContext) return audioContext;
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return null;
-      audioContext = new AudioCtx();
-      return audioContext;
+    function getAudio(){
+      if(audioCtx) return audioCtx;
+      const C=window.AudioContext||window.webkitAudioContext;
+      if(!C) return null;
+      audioCtx=new C(); return audioCtx;
     }
 
-    function tone(freq, durationMs, gainValue = 0.08, delayMs = 0) {
-      const ctx = getAudioContext();
-      if (!ctx) return Promise.resolve();
-      return new Promise((resolve) => {
-        const startAt = ctx.currentTime + delayMs / 1000;
-        const stopAt = startAt + durationMs / 1000;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(freq, startAt);
-        gain.gain.setValueAtTime(0.0001, startAt);
-        gain.gain.exponentialRampToValueAtTime(gainValue, startAt + 0.02);
-        gain.gain.setValueAtTime(gainValue, Math.max(startAt + 0.03, stopAt - 0.04));
-        gain.gain.exponentialRampToValueAtTime(0.0001, stopAt);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(startAt);
-        osc.stop(stopAt + 0.02);
-        setTimeout(resolve, durationMs + delayMs + 40);
+    function tone(freq,ms,g=.055){
+      const ctx=getAudio();
+      if(!ctx) return Promise.resolve();
+      return new Promise(resolve=>{
+        const o=ctx.createOscillator(),gain=ctx.createGain();
+        o.type="sine";o.frequency.value=freq;gain.gain.value=g;
+        o.connect(gain);gain.connect(ctx.destination);
+        o.start();o.stop(ctx.currentTime+ms/1000);
+        setTimeout(resolve,ms+30);
       });
     }
 
-    async function playRingback(sessionId) {
-      const ctx = getAudioContext();
-      if (ctx?.state === "suspended") {
-        try { await ctx.resume(); } catch {}
+    async function ring(session){
+      const ctx=getAudio();
+      if(ctx?.state==="suspended"){try{await ctx.resume()}catch{}}
+      for(let i=0;i<2;i++){
+        if(!callMode||session!==callSession) return false;
+        await Promise.all([tone(440,720,.045),tone(480,720,.035)]);
+        if(!callMode||session!==callSession) return false;
+        await new Promise(r=>setTimeout(r,420));
       }
-      for (let i = 0; i < 2; i += 1) {
-        if (!callMode || callSessionId !== sessionId) return false;
-        await Promise.all([
-          tone(440, 780, 0.055),
-          tone(480, 780, 0.045)
-        ]);
-        if (!callMode || callSessionId !== sessionId) return false;
-        if (i === 0) await new Promise((resolve) => setTimeout(resolve, 520));
-      }
-      return callMode && callSessionId === sessionId;
+      return callMode&&session===callSession;
     }
 
-    async function playHangupTone() {
-      const ctx = getAudioContext();
-      if (ctx?.state === "suspended") {
-        try { await ctx.resume(); } catch {}
-      }
-      await tone(620, 120, 0.06);
-      await new Promise((resolve) => setTimeout(resolve, 70));
-      await tone(520, 120, 0.055);
-      await new Promise((resolve) => setTimeout(resolve, 70));
-      await tone(420, 170, 0.05);
+    async function hangupTone(){
+      await tone(620,120,.05);
+      await new Promise(r=>setTimeout(r,60));
+      await tone(500,120,.045);
+      await new Promise(r=>setTimeout(r,60));
+      await tone(390,170,.04);
     }
 
-    function stopSpeech() {
-      try { window.speechSynthesis?.cancel(); } catch {}
+    function stopSpeech(){try{speechSynthesis.cancel()}catch{}}
+
+    function spokenReply(data){
+      if(data.status==="needs_information"){
+        return data.followUpQuestionAr||(uiLang==="ar"?"محتاج معلومة إضافية علشان أكمل الطلب.":"I need one more detail to continue.");
+      }
+      const fare=data.pricing?.estimatedFare;
+      const veh=vehicleName(data.recommendation);
+      const count=(data.offers||[]).length;
+      if(uiLang==="ar"){
+        return ["تمام، فهمت طلبك.","العربية المناسبة "+veh+".",fare!=null?"السعر التقديري "+fare+" جنيه.":"",count?"وصل "+count+" عروض من السائقين.":""].filter(Boolean).join(" ");
+      }
+      return ["Got it.","Suggested vehicle: "+veh+".",fare!=null?"Estimated fare: "+fare+" EGP.":"",count?count+" driver offers are available.":""].filter(Boolean).join(" ");
     }
 
-    function buildSpokenReply(data) {
-      if (data.status === "needs_information") {
-        return data.followUpQuestionAr || (uiLang === "ar"
-          ? "محتاج معلومة إضافية علشان أكمل طلب النقل."
-          : "I need one more detail to continue your transport request.");
-      }
-
-      const vehicle = data.recommendation?.vehicleNameAr || "";
-      const fare = data.pricing?.estimatedFare;
-      const offers = Array.isArray(data.offers) ? data.offers.length : 0;
-
-      if (uiLang === "ar") {
-        let parts = ["تمام، فهمت طلبك."];
-        if (vehicle) parts.push("العربية المناسبة " + vehicle + ".");
-        if (fare != null) parts.push("السعر التقديري " + fare + " جنيه.");
-        if (offers) parts.push("وصل " + offers + " عروض من السائقين.");
-        parts.push("تقدر تختار العرض المناسب.");
-        return parts.join(" ");
-      }
-
-      let parts = ["Got it. I understood your request."];
-      if (vehicle) parts.push("Suggested vehicle: " + vehicle + ".");
-      if (fare != null) parts.push("Estimated fare: " + fare + " EGP.");
-      if (offers) parts.push(offers + " driver offers are available.");
-      parts.push("You can choose the offer you prefer.");
-      return parts.join(" ");
-    }
-
-    function speakAgentReply(data) {
-      return new Promise((resolve) => {
-        if (!("speechSynthesis" in window)) return resolve();
+    function speakReply(data){
+      return new Promise(resolve=>{
+        if(!("speechSynthesis" in window)) return resolve();
         stopSpeech();
-        const utterance = new SpeechSynthesisUtterance(buildSpokenReply(data));
-        utterance.lang = uiLang === "ar" ? "ar-EG" : "en-US";
-        utterance.rate = 1;
-        utterance.onend = resolve;
-        utterance.onerror = resolve;
-        window.speechSynthesis.speak(utterance);
+        const u=new SpeechSynthesisUtterance(spokenReply(data));
+        u.lang=uiLang==="ar"?"ar-EG":"en-US";
+        u.onend=resolve;u.onerror=resolve;
+        speechSynthesis.speak(u);
       });
     }
 
-    function scheduleCallListening() {
-      if (!callMode || !recognition) return;
-      clearTimeout(callRestartTimer);
-      callRestartTimer = setTimeout(() => {
-        if (!callMode || listening) return;
-        try {
-          recognition.start();
-        } catch {
-          voiceStatus.textContent = t("micError");
+    function initRecognition(){
+      const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+      if(!SR) return;
+      recognition=new SR();
+      recognition.lang="ar-EG";
+      recognition.interimResults=true;
+      recognition.continuous=false;
+      let finalText="";
+      recognition.onstart=()=>{
+        listening=true;finalText="";
+        el("status").textContent=t("listening");
+      };
+      recognition.onresult=e=>{
+        let interim="";
+        for(let i=e.resultIndex;i<e.results.length;i++){
+          const tx=e.results[i][0].transcript||"";
+          if(e.results[i].isFinal) finalText+=tx+" "; else interim+=tx;
         }
-      }, 350);
+        el("input").value=(finalText+interim).trim();
+      };
+      recognition.onerror=()=>{listening=false;el("status").textContent=t("idle")};
+      recognition.onend=async()=>{
+        listening=false;
+        if(callMode&&el("input").value.trim()){
+          await submitAgent({speak:true});
+          if(callMode) startListening();
+        }else{
+          el("status").textContent=t("idle");
+        }
+      };
     }
 
-    function stopCallMode({ playTone = true } = {}) {
-      const wasInCall = callMode || callRinging;
-      callMode = false;
-      callRinging = false;
-      callSessionId += 1;
-      callConversationText = "";
-      clearTimeout(callRestartTimer);
+    function startListening(){
+      if(!recognition){el("status").textContent=t("failed");return;}
+      recognition.lang=uiLang==="ar"?"ar-EG":"en-US";
+      try{recognition.start()}catch{}
+    }
+
+    async function startCall(){
+      if(callMode){endCall();return;}
+      callMode=true;
+      const session=++callSession;
+      setMode("call");
+      el("call").classList.add("calling");
+      el("callOverlay").classList.remove("hidden");
+      el("callStatus").textContent=t("ringing");
       stopSpeech();
-      if (recognition && listening) {
-        try { recognition.stop(); } catch {}
-      }
-      call.classList.remove("calling", "ringing");
-      call.textContent = t("call");
+      const connected=await ring(session);
+      if(!connected||!callMode||session!==callSession) return;
+      el("callStatus").textContent=t("connected");
+      startListening();
+    }
+
+    function endCall(){
+      const was=callMode;
+      callMode=false;callSession++;
+      if(recognition&&listening){try{recognition.stop()}catch{}}
+      stopSpeech();
+      el("callOverlay").classList.add("hidden");
+      el("call").classList.remove("calling");
       setMode("chat");
-      voiceStatus.textContent = t("voiceIdle");
-      if (playTone && wasInCall) playHangupTone();
+      el("status").textContent=t("ending");
+      if(was) hangupTone();
+      setTimeout(()=>{if(!callMode) el("status").textContent=t("idle")},900);
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
-    let listening = false;
+    el("langBtn").addEventListener("click",()=>{uiLang=uiLang==="ar"?"en":"ar";applyLanguage()});
+    el("example").addEventListener("click",()=>{
+      el("input").value=uiLang==="ar"
+        ?"عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو والمسافة 12 كم"
+        :"I need to move 20 boxes from Smouha to Mansheya tomorrow at 3 PM, around 250 kg, distance 12 km";
+      el("input").focus();
+    });
+    el("chat").addEventListener("click",()=>{if(callMode)endCall();setMode("chat");el("input").focus()});
+    el("voice").addEventListener("click",()=>{if(callMode)endCall();setMode("voice");startListening()});
+    el("call").addEventListener("click",startCall);
+    el("endCall").addEventListener("click",endCall);
+    el("run").addEventListener("click",()=>submitAgent());
 
-    function setListening(active) {
-      listening = active;
-      voice.classList.toggle("listening", active && !callMode);
-      voice.textContent = active && !callMode ? t("stop") : t("voice");
-      if (callMode && !callRinging) {
-        call.classList.toggle("calling", active);
-        call.textContent = t("endCall");
-      }
-    }
-
-    if (SpeechRecognition) {
-      recognition = new SpeechRecognition();
-      recognition.lang = "ar-EG";
-      recognition.interimResults = true;
-      recognition.continuous = false;
-      recognition.maxAlternatives = 1;
-
-      let finalTranscript = "";
-      let capturedThisTurn = false;
-
-      recognition.onstart = () => {
-        finalTranscript = "";
-        capturedThisTurn = false;
-        setListening(true);
-        voiceStatus.textContent = callMode ? t("callListening") : t("listening");
-      };
-
-      recognition.onresult = (event) => {
-        let interim = "";
-        for (let i = event.resultIndex; i < event.results.length; i += 1) {
-          const transcript = event.results[i][0].transcript;
-          if (transcript && transcript.trim()) capturedThisTurn = true;
-          if (event.results[i].isFinal) finalTranscript += transcript + " ";
-          else interim += transcript;
-        }
-        const currentTurn = (finalTranscript + interim).trim();
-        input.value = callMode
-          ? [callConversationText, currentTurn].filter(Boolean).join(" ").trim()
-          : currentTurn;
-      };
-
-      recognition.onerror = (event) => {
-        setListening(false);
-        voiceStatus.textContent =
-          event.error === "not-allowed" ? t("permission") :
-          event.error === "no-speech" ? t("noSpeech") :
-          t("micError");
-      };
-
-      recognition.onend = async () => {
-        const hadText = capturedThisTurn && input.value.trim().length > 0;
-        setListening(false);
-
-        if (callMode) {
-          if (hadText) {
-            callConversationText = input.value.trim();
-            voiceStatus.textContent = t("callThinking");
-            await submitAgentRequest({ speakReply: true });
-          }
-          if (callMode) scheduleCallListening();
-          return;
-        }
-
-        if (hadText) {
-          voiceStatus.textContent = t("captured");
-          setMode("voice");
-        } else {
-          voiceStatus.textContent = t("noSpeech");
-        }
-      };
-
-      voice.addEventListener("click", () => {
-        if (callMode) stopCallMode();
-        setMode("voice");
-        if (listening) return recognition.stop();
-        try { recognition.start(); }
-        catch { voiceStatus.textContent = t("micError"); }
-      });
-
-      call.addEventListener("click", async () => {
-        if (callMode || callRinging) {
-          stopCallMode();
-          return;
-        }
-
-        callMode = true;
-        callRinging = true;
-        const sessionId = ++callSessionId;
-        callConversationText = input.value.trim();
-        setMode("call");
-        call.classList.remove("calling");
-        call.classList.add("ringing");
-        call.textContent = t("ringing");
-        voiceStatus.textContent = t("ringingStatus");
-        stopSpeech();
-
-        if (listening) {
-          try { recognition.stop(); } catch {}
-        }
-
-        const connected = await playRingback(sessionId);
-        if (!connected || !callMode || callSessionId !== sessionId) return;
-
-        callRinging = false;
-        call.classList.remove("ringing");
-        call.classList.add("calling");
-        call.textContent = t("endCall");
-        voiceStatus.textContent = t("connectedStatus");
-
-        setTimeout(() => {
-          if (!callMode || callSessionId !== sessionId) return;
-          voiceStatus.textContent = t("callListening");
-          scheduleCallListening();
-        }, 320);
-      });
-    } else {
-      voice.disabled = true;
-      call.disabled = true;
-      voiceStatus.textContent = t("micError");
-    }
-
+    initRecognition();
     applyLanguage();
   </script>
 </body>
