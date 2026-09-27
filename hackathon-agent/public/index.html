@@ -760,7 +760,7 @@
       try {
         let data;
         if (serverAvailable) {
-          const response = await fetch("/api/agent", {
+          const response = await fetch("api/agent", {
             method: "POST",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ input: text })
