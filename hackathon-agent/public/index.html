@@ -632,7 +632,7 @@
     const offerTimer = el("offerTimer");
     const acceptedBox = el("acceptedBox");
     const isLocalServer = ["localhost", "127.0.0.1"].includes(location.hostname);
-    const isHostedAgent = location.pathname.startsWith("/ai/") || location.pathname.startsWith("/ai-agent/");
+    const isHostedAgent = location.pathname.startsWith("/ai/") || location.pathname.startsWith("/ai-agent/") || location.pathname.startsWith("/agent/");
     const hasServerApi = isLocalServer || isHostedAgent;
     let serverAvailable = hasServerApi;
     let lastData = null;
