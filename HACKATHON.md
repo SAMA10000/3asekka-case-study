@@ -2,6 +2,16 @@
 
 Public hackathon entry point for **3ASEKKA (عالسكة)**.
 
+## Live demo
+
+**Try the deployed agent:** https://3asekka.com/ai-agent/
+
+Recommended reviewer test:
+
+> عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو والمسافة 12 كم
+
+The live server runs the AI extraction layer with Gemini and keeps the API key server-side.
+
 ## One-line pitch
 
 **An Arabic AI operations agent that converts a simple goods-transport request into an actionable local transport job, then orchestrates vehicle selection, routing, fare estimation and driver-matching stages.**
