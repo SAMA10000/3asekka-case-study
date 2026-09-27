@@ -50,6 +50,23 @@
       .find((x) => n.includes(x)) || null;
   }
 
+  function createOffers(fare) {
+    if (!Number.isFinite(fare)) return [];
+    const drivers = [
+      { name: "أحمد", rating: 4.8, completedTrips: 326, mult: 0.95 },
+      { name: "محمود", rating: 4.9, completedTrips: 514, mult: 1.00 },
+      { name: "كريم", rating: 4.7, completedTrips: 281, mult: 1.08 }
+    ];
+    return drivers.map((d, i) => ({
+      id: "demo-offer-" + (i + 1),
+      driverName: d.name,
+      amount: Math.round(fare * d.mult),
+      rating: d.rating,
+      completedTrips: d.completedTrips,
+      simulated: true
+    }));
+  }
+
   window.run3AsekkaBrowserFallback = function (input) {
     const n = normalize(input);
     const route = routeFrom(input);
@@ -131,7 +148,7 @@
         source: Number.isFinite(distanceKm) ? "user_supplied_demo_value" : "production_route_engine_boundary"
       },
       pricing: { estimatedFare: fare, currency: "EGP", demoOnly: true },
-      offers: [],
+      offers: createOffers(fare),
       missing,
       followUpQuestionAr: missing.length
         ? "محتاج أعرف " + missing.map((x) => labels[x]).join(" و") + " علشان أكمل طلب النقل."
