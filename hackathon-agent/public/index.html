@@ -199,6 +199,13 @@
       box-shadow: 0 7px 16px rgba(21,128,61,.18);
     }
 
+    .btn-call.ringing {
+      color: #fff;
+      background: #D97706;
+      border-color: #D97706;
+      box-shadow: 0 7px 16px rgba(217,119,6,.18);
+    }
+
     .btn {
       border: 0;
       border-radius: 15px;
@@ -497,7 +504,10 @@
         voice: "🎤 فويس",
         call: "📞 كلم عالسكة",
         stop: "⏹️ إيقاف",
+        ringing: "📞 جاري الاتصال...",
         endCall: "⏹️ إنهاء المكالمة",
+        ringingStatus: "بيرن على عالسكة...",
+        connectedStatus: "✓ تم الاتصال بعالسكة.",
         callListening: "📞 المكالمة شغالة... اتكلم بطبيعتك.",
         callThinking: "عالسكة بيفهم طلبك...",
         callReady: "المكالمة جاهزة. اتكلم تاني أو اضغط إنهاء المكالمة.",
@@ -555,7 +565,10 @@
         voice: "🎤 Voice",
         call: "📞 Call 3ASEKKA",
         stop: "⏹️ Stop",
+        ringing: "📞 Calling...",
         endCall: "⏹️ End Call",
+        ringingStatus: "Ringing 3ASEKKA...",
+        connectedStatus: "✓ Connected to 3ASEKKA.",
         callListening: "📞 Call is live... speak naturally.",
         callThinking: "3ASEKKA is understanding your request...",
         callReady: "Call is ready. Speak again or end the call.",
@@ -639,7 +652,7 @@
       run.textContent = t("run");
       chat.textContent = t("chat");
       voice.textContent = listening && !callMode ? t("stop") : t("voice");
-      call.textContent = callMode ? t("endCall") : t("call");
+      call.textContent = callRinging ? t("ringing") : (callMode ? t("endCall") : t("call"));
       voiceStatus.textContent = t("voiceIdle");
       el("summaryTitle").textContent = t("summaryTitle");
       el("biddingTitle").textContent = t("biddingTitle");
@@ -657,7 +670,7 @@
     }
 
     chat.addEventListener("click", () => {
-      if (callMode) stopCallMode();
+      if (callMode || callRinging) stopCallMode();
       if (listening && recognition) recognition.stop();
       setMode("chat");
       voiceStatus.textContent = t("voiceIdle");
@@ -865,8 +878,70 @@
     run.addEventListener("click", () => submitAgentRequest());
 
     let callMode = false;
+    let callRinging = false;
     let callRestartTimer = null;
     let callConversationText = "";
+    let callSessionId = 0;
+    let audioContext = null;
+
+    function getAudioContext() {
+      if (audioContext) return audioContext;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      audioContext = new AudioCtx();
+      return audioContext;
+    }
+
+    function tone(freq, durationMs, gainValue = 0.08, delayMs = 0) {
+      const ctx = getAudioContext();
+      if (!ctx) return Promise.resolve();
+      return new Promise((resolve) => {
+        const startAt = ctx.currentTime + delayMs / 1000;
+        const stopAt = startAt + durationMs / 1000;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, startAt);
+        gain.gain.setValueAtTime(0.0001, startAt);
+        gain.gain.exponentialRampToValueAtTime(gainValue, startAt + 0.02);
+        gain.gain.setValueAtTime(gainValue, Math.max(startAt + 0.03, stopAt - 0.04));
+        gain.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(startAt);
+        osc.stop(stopAt + 0.02);
+        setTimeout(resolve, durationMs + delayMs + 40);
+      });
+    }
+
+    async function playRingback(sessionId) {
+      const ctx = getAudioContext();
+      if (ctx?.state === "suspended") {
+        try { await ctx.resume(); } catch {}
+      }
+      for (let i = 0; i < 2; i += 1) {
+        if (!callMode || callSessionId !== sessionId) return false;
+        await Promise.all([
+          tone(440, 780, 0.055),
+          tone(480, 780, 0.045)
+        ]);
+        if (!callMode || callSessionId !== sessionId) return false;
+        if (i === 0) await new Promise((resolve) => setTimeout(resolve, 520));
+      }
+      return callMode && callSessionId === sessionId;
+    }
+
+    async function playHangupTone() {
+      const ctx = getAudioContext();
+      if (ctx?.state === "suspended") {
+        try { await ctx.resume(); } catch {}
+      }
+      await tone(620, 120, 0.06);
+      await new Promise((resolve) => setTimeout(resolve, 70));
+      await tone(520, 120, 0.055);
+      await new Promise((resolve) => setTimeout(resolve, 70));
+      await tone(420, 170, 0.05);
+    }
 
     function stopSpeech() {
       try { window.speechSynthesis?.cancel(); } catch {}
@@ -926,18 +1001,22 @@
       }, 350);
     }
 
-    function stopCallMode() {
+    function stopCallMode({ playTone = true } = {}) {
+      const wasInCall = callMode || callRinging;
       callMode = false;
+      callRinging = false;
+      callSessionId += 1;
       callConversationText = "";
       clearTimeout(callRestartTimer);
       stopSpeech();
       if (recognition && listening) {
         try { recognition.stop(); } catch {}
       }
-      call.classList.remove("calling");
+      call.classList.remove("calling", "ringing");
       call.textContent = t("call");
       setMode("chat");
       voiceStatus.textContent = t("voiceIdle");
+      if (playTone && wasInCall) playHangupTone();
     }
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -948,7 +1027,7 @@
       listening = active;
       voice.classList.toggle("listening", active && !callMode);
       voice.textContent = active && !callMode ? t("stop") : t("voice");
-      if (callMode) {
+      if (callMode && !callRinging) {
         call.classList.toggle("calling", active);
         call.textContent = t("endCall");
       }
@@ -1023,24 +1102,41 @@
         catch { voiceStatus.textContent = t("micError"); }
       });
 
-      call.addEventListener("click", () => {
-        if (callMode) {
+      call.addEventListener("click", async () => {
+        if (callMode || callRinging) {
           stopCallMode();
           return;
         }
+
         callMode = true;
+        callRinging = true;
+        const sessionId = ++callSessionId;
         callConversationText = input.value.trim();
         setMode("call");
-        call.classList.add("calling");
-        call.textContent = t("endCall");
-        voiceStatus.textContent = t("callListening");
+        call.classList.remove("calling");
+        call.classList.add("ringing");
+        call.textContent = t("ringing");
+        voiceStatus.textContent = t("ringingStatus");
         stopSpeech();
+
         if (listening) {
           try { recognition.stop(); } catch {}
-          scheduleCallListening();
-        } else {
-          scheduleCallListening();
         }
+
+        const connected = await playRingback(sessionId);
+        if (!connected || !callMode || callSessionId !== sessionId) return;
+
+        callRinging = false;
+        call.classList.remove("ringing");
+        call.classList.add("calling");
+        call.textContent = t("endCall");
+        voiceStatus.textContent = t("connectedStatus");
+
+        setTimeout(() => {
+          if (!callMode || callSessionId !== sessionId) return;
+          voiceStatus.textContent = t("callListening");
+          scheduleCallListening();
+        }, 320);
       });
     } else {
       voice.disabled = true;
