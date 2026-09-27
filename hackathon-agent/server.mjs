@@ -29,15 +29,18 @@ async function servePublicFile(res, filename, contentType) {
 }
 
 const server = http.createServer(async (req, res) => {
-  if (req.method === "GET" && (req.url === "/" || req.url === "/index.html")) {
+  const requestUrl = new URL(req.url || "/", "http://localhost");
+  const pathname = requestUrl.pathname;
+
+  if (req.method === "GET" && (pathname === "/" || pathname === "/index.html")) {
     if (await servePublicFile(res, "index.html", "text/html; charset=utf-8")) return;
   }
 
-  if (req.method === "GET" && req.url === "/browser-fallback.js") {
+  if (req.method === "GET" && pathname === "/browser-fallback.js") {
     if (await servePublicFile(res, "browser-fallback.js", "text/javascript; charset=utf-8")) return;
   }
 
-  if (req.method === "GET" && req.url === "/api/status") {
+  if (req.method === "GET" && pathname === "/api/status") {
     sendJson(res, 200, {
       ok: true,
       agent: "3ASEKKA AI Transport Agent",
@@ -46,7 +49,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (req.method === "GET" && req.url === "/api/ai-test") {
+  if (req.method === "GET" && pathname === "/api/ai-test") {
     const probe = await extractTransportWithAI("عايز أنقل 5 كراتين من سموحة للمنشية وزنهم 40 كيلو");
     sendJson(res, 200, {
       ok: true,
@@ -56,7 +59,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (req.method === "POST" && req.url === "/api/agent") {
+  if (req.method === "POST" && pathname === "/api/agent") {
     let body = "";
     for await (const chunk of req) body += chunk;
 
@@ -78,7 +81,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (req.method === "GET" && req.url === "/health") {
+  if (req.method === "GET" && pathname === "/health") {
     sendJson(res, 200, {
       ok: true,
       agent: "3ASEKKA AI Transport Agent",
