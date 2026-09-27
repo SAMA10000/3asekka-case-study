@@ -69,7 +69,7 @@ The public demo returns an explicit action trace so reviewers can see the sequen
 
 ## Try it online
 
-**Live deployment:** https://3asekka.com/ai-agent/
+**Live deployment:** https://3asekka.com/agent/
 
 The deployed version runs the Node agent server-side and keeps Gemini credentials off the client.
 
