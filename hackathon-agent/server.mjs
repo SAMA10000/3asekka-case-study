@@ -40,6 +40,10 @@ const server = http.createServer(async (req, res) => {
     if (await servePublicFile(res, "browser-fallback.js", "text/javascript; charset=utf-8")) return;
   }
 
+  if (req.method === "GET" && pathname === "/3asekka-logo.png") {
+    if (await servePublicFile(res, "3asekka-logo.png", "image/png")) return;
+  }
+
   if (req.method === "GET" && pathname === "/api/status") {
     sendJson(res, 200, {
       ok: true,
