@@ -129,6 +129,16 @@ sleep 2
 
 curl -fsS "http://127.0.0.1:$PORT/health" >/dev/null
 
+AI_PROBE="$(curl -fsS "http://127.0.0.1:$PORT/api/ai-test")"
+python3 - "$AI_PROBE" <<'PY'
+import json, sys
+data = json.loads(sys.argv[1])
+probe = data.get("probe") or {}
+if probe.get("used") is not True:
+    raise SystemExit("Gemini AI probe failed: " + str(probe.get("error") or probe))
+print("AI_PROBE=PASS provider=" + str(probe.get("provider")) + " model=" + str(probe.get("model")))
+PY
+
 cp -a "$NGINX_SITE" "$NGINX_BACKUP"
 HAD_OLD_NGINX=1
 
