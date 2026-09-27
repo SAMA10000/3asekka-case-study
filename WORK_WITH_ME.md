@@ -59,7 +59,7 @@ I build practical AI-enabled products and operational workflows, especially wher
 
 See the main [README](README.md), [AI portfolio](PORTFOLIO.md), and [showcase](SHOWCASE.md).
 
-**Try the live AI transport agent:** https://3asekka.com/ai-agent/
+**Try the live AI transport agent:** https://3asekka.com/agent/
 
 ## Best-fit project types
 
