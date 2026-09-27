@@ -6,9 +6,14 @@ APP_ROOT="/opt/3asekka-ai-agent"
 SRC_DIR="$APP_ROOT/source"
 ENV_FILE="/etc/3asekka-ai-agent.env"
 SERVICE_FILE="/etc/systemd/system/3asekka-ai-agent.service"
-NGINX_SITE="/etc/nginx/sites-available/3asekka.com"
-NGINX_BACKUP="/etc/nginx/sites-available/3asekka.com.bak.$(date +%Y%m%d_%H%M%S)"
 PORT="3300"
+
+NGINX_SITE="$(grep -RIlE 'server_name[^;]*3asekka\\.com' /etc/nginx/sites-enabled /etc/nginx/sites-available 2>/dev/null | head -n1 || true)"
+if [[ -z "$NGINX_SITE" || ! -f "$NGINX_SITE" ]]; then
+  echo "Could not locate the active Nginx vhost containing server_name 3asekka.com"
+  exit 1
+fi
+NGINX_BACKUP="${NGINX_SITE}.bak.$(date +%Y%m%d_%H%M%S)"
 
 if [[ $EUID -ne 0 ]]; then
   echo "Run as root."
@@ -26,11 +31,7 @@ if [[ "$NODE_MAJOR" -lt 18 ]]; then
   exit 1
 fi
 
-if [[ ! -f "$NGINX_SITE" ]]; then
-  echo "Expected Nginx site not found: $NGINX_SITE"
-  exit 1
-fi
-
+echo "NGINX_SITE=$NGINX_SITE"
 mkdir -p "$APP_ROOT"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
@@ -78,8 +79,9 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable --now 3asekka-ai-agent
-sleep 1
+systemctl enable 3asekka-ai-agent >/dev/null 2>&1 || true
+systemctl restart 3asekka-ai-agent
+sleep 2
 
 curl -fsS "http://127.0.0.1:$PORT/health" >/dev/null
 
@@ -142,6 +144,16 @@ fi
 systemctl reload nginx
 
 echo
-echo "Deployment complete."
+echo "=== VERIFY ==="
+curl -fsS "http://127.0.0.1:$PORT/health"
+echo
+HTTP_CODE="$(curl -k -sS -o /tmp/3asekka_ai_verify.html -w '%{http_code}' https://3asekka.com/ai/ || true)"
+echo "PUBLIC_HTTP=$HTTP_CODE"
+if [[ "$HTTP_CODE" != "200" ]]; then
+  echo "Public /ai/ verification failed. Nginx backup kept at: $NGINX_BACKUP"
+  exit 1
+fi
+
+echo "DEPLOY_OK=YES"
 echo "Open: https://3asekka.com/ai/"
 echo "Service: systemctl status 3asekka-ai-agent --no-pager"
