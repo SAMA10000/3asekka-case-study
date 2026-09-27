@@ -15,7 +15,7 @@
 - **Backend + database + realtime infrastructure** for operational workflows
 - **AI/OCR verification layer** for driver onboarding
 - **AI voice / policy-audio automation layer**
-- **Live AI transport agent:** https://3asekka.com/ai-agent/
+- **Live AI transport agent:** https://3asekka.com/agent/
 - **Maps, route pricing, bidding, tracking, finance and communication systems**
 
 The native client is one React Native / Expo application with role-specific customer and driver flows rather than falsely presenting two unrelated mobile codebases.
