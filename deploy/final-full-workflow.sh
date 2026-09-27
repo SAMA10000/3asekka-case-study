@@ -5,10 +5,10 @@ APP="/opt/3asekka-ai-agent/source"
 STAMP="$(date +%Y%m%d_%H%M%S)"
 BACKUP="/opt/3asekka-ai-agent/backups/full_workflow_$STAMP"
 
-AGENT_URL="https://raw.githubusercontent.com/SAMA10000/3asekka-case-study/e8afaf42ea927d6e32af323d367d3e766fb7e60e/hackathon-agent/agent.mjs"
-SERVER_URL="https://raw.githubusercontent.com/SAMA10000/3asekka-case-study/4852222c7ee35b9380364f2a87418153ac5631b5/hackathon-agent/server.mjs"
-INDEX_URL="https://raw.githubusercontent.com/SAMA10000/3asekka-case-study/53702c6e44069f24469322136f7a1d4480d6736f/hackathon-agent/public/index.html"
-FALLBACK_URL="https://raw.githubusercontent.com/SAMA10000/3asekka-case-study/a8217340a34b8c7f8ba886f7dedccf6e7a8133e8/hackathon-agent/public/browser-fallback.js"
+AGENT_URL="https://raw.githubusercontent.com/SAMA10000/3asekka-case-study/6059b2f7e0e0dca41546a3277eca8102b2f44fc4/hackathon-agent/agent.mjs"
+SERVER_URL="https://raw.githubusercontent.com/SAMA10000/3asekka-case-study/6059b2f7e0e0dca41546a3277eca8102b2f44fc4/hackathon-agent/server.mjs"
+INDEX_URL="https://raw.githubusercontent.com/SAMA10000/3asekka-case-study/6059b2f7e0e0dca41546a3277eca8102b2f44fc4/hackathon-agent/public/index.html"
+FALLBACK_URL="https://raw.githubusercontent.com/SAMA10000/3asekka-case-study/6059b2f7e0e0dca41546a3277eca8102b2f44fc4/hackathon-agent/public/browser-fallback.js"
 
 echo "=== 3ASEKKA FULL WORKFLOW FINAL PATCH ==="
 
