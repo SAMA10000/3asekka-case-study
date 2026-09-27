@@ -10,15 +10,21 @@ PORT="3300"
 STAMP="$(date +%Y%m%d_%H%M%S)"
 BACKUP_DIR="$APP_ROOT/backups/$STAMP"
 
-NGINX_SITE="$(grep -RIlE 'server_name[^;]*3asekka\\.com' /etc/nginx 2>/dev/null \
-  | grep -vE '\\.bak\\.|/backup/|/backups/' \
-  | head -n1 || true)"
+if [[ -e /etc/nginx/sites-enabled/3asekka.com ]]; then
+  NGINX_SITE="$(readlink -f /etc/nginx/sites-enabled/3asekka.com)"
+elif [[ -f /etc/nginx/sites-available/3asekka.com ]]; then
+  NGINX_SITE="/etc/nginx/sites-available/3asekka.com"
+else
+  NGINX_SITE="$(grep -RIlE 'server_name[^;]*3asekka\.com' /etc/nginx 2>/dev/null \
+    | grep -vE '\.bak\.|/backup/|/backups/' \
+    | head -n1 || true)"
+fi
 
 if [[ -z "$NGINX_SITE" || ! -f "$NGINX_SITE" ]]; then
   echo "Could not locate a file containing server_name 3asekka.com."
   echo "Detected Nginx server_name directives:"
   grep -RInE '^[[:space:]]*server_name[[:space:]]+' /etc/nginx 2>/dev/null \
-    | grep -vE '\\.bak\\.|/backup/|/backups/' \
+    | grep -vE '\.bak\.|/backup/|/backups/' \
     | head -n 80 || true
   exit 1
 fi
