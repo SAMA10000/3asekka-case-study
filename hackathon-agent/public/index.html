@@ -569,7 +569,9 @@
     const offerTimer = el("offerTimer");
     const acceptedBox = el("acceptedBox");
     const isLocalServer = ["localhost", "127.0.0.1"].includes(location.hostname);
-    let serverAvailable = isLocalServer;
+    const isHostedAgent = location.pathname.startsWith("/ai/");
+    const hasServerApi = isLocalServer || isHostedAgent;
+    let serverAvailable = hasServerApi;
     let lastData = null;
 
     function t(key) { return dict[uiLang][key]; }
@@ -773,12 +775,14 @@
         render(data);
         voiceStatus.textContent = t("voiceIdle");
       } catch (error) {
-        if (!isLocalServer) {
+        if (!hasServerApi) {
           serverAvailable = false;
           render(window.run3AsekkaBrowserFallback(text));
           voiceStatus.textContent = t("voiceIdle");
         } else {
-          voiceStatus.textContent = t("micError");
+          voiceStatus.textContent = uiLang === "ar"
+            ? "تعذر الاتصال بالـAI على السيرفر. جرّب مرة أخرى."
+            : "Could not reach the AI server. Please try again.";
           console.error(error);
         }
       } finally {
