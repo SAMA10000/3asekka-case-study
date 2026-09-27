@@ -358,7 +358,7 @@
       <div class="topbar">
         <button id="langBtn" class="lang" type="button">EN</button>
         <div class="logo-wrap">
-          <img id="mainLogo" src="/assets/images/logo_icon/logo.png" alt="عالسكة" />
+          <img id="mainLogo" src="/agent/3asekka-logo.png" alt="عالسكة" />
         </div>
       </div>
       <h1 id="heroTitle">اطلب… ونحجز لك نقلتك فورًا</h1>
@@ -487,10 +487,6 @@
 
     const el=id=>document.getElementById(id);
     const t=k=>dict[uiLang][k];
-
-    el("mainLogo").addEventListener("error",()=>{
-      el("mainLogo").src="/assets/images/logo_icon/logo_main_1024.png";
-    });
 
     function applyLanguage(){
       document.documentElement.lang=uiLang;
