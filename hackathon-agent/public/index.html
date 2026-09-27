@@ -866,6 +866,7 @@
 
     let callMode = false;
     let callRestartTimer = null;
+    let callConversationText = "";
 
     function stopSpeech() {
       try { window.speechSynthesis?.cancel(); } catch {}
@@ -927,6 +928,7 @@
 
     function stopCallMode() {
       callMode = false;
+      callConversationText = "";
       clearTimeout(callRestartTimer);
       stopSpeech();
       if (recognition && listening) {
@@ -977,7 +979,10 @@
           if (event.results[i].isFinal) finalTranscript += transcript + " ";
           else interim += transcript;
         }
-        input.value = (finalTranscript + interim).trim();
+        const currentTurn = (finalTranscript + interim).trim();
+        input.value = callMode
+          ? [callConversationText, currentTurn].filter(Boolean).join(" ").trim()
+          : currentTurn;
       };
 
       recognition.onerror = (event) => {
@@ -994,6 +999,7 @@
 
         if (callMode) {
           if (hadText) {
+            callConversationText = input.value.trim();
             voiceStatus.textContent = t("callThinking");
             await submitAgentRequest({ speakReply: true });
           }
@@ -1023,6 +1029,7 @@
           return;
         }
         callMode = true;
+        callConversationText = input.value.trim();
         setMode("call");
         call.classList.add("calling");
         call.textContent = t("endCall");
