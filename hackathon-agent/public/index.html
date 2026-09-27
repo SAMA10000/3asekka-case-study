@@ -164,9 +164,39 @@
 
     .actions-row {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
       margin-top: 12px;
+    }
+
+    .start-row {
+      margin-top: 10px;
+    }
+
+    .start-row .btn-primary {
+      width: 100%;
+      min-height: 54px;
+      font-size: 16px;
+    }
+
+    .mode-btn {
+      color: var(--primary-dark);
+      background: var(--primary-soft);
+      border: 1px solid #FFD1B5;
+    }
+
+    .mode-btn.active {
+      color: #fff;
+      background: var(--primary);
+      border-color: var(--primary);
+      box-shadow: 0 7px 16px rgba(230,81,0,.18);
+    }
+
+    .btn-call.calling {
+      color: #fff;
+      background: #15803D;
+      border-color: #15803D;
+      box-shadow: 0 7px 16px rgba(21,128,61,.18);
     }
 
     .btn {
@@ -376,7 +406,8 @@
     }
 
     @media (max-width: 520px) {
-      .actions-row { grid-template-columns: 1fr; }
+      .actions-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .actions-row .btn { padding-inline: 7px; font-size: 12px; }
       .summary-grid { grid-template-columns: 1fr 1fr; }
       .hero { padding: 22px 18px 30px; }
       .content { padding-inline: 12px; }
@@ -409,8 +440,13 @@
         <textarea id="input" placeholder="اكتب طلب النقل هنا..."></textarea>
 
         <div class="actions-row">
+          <button id="chat" class="btn mode-btn active" type="button">💬 شات</button>
+          <button id="voice" class="btn mode-btn btn-voice" type="button">🎤 فويس</button>
+          <button id="call" class="btn mode-btn btn-call" type="button">📞 كلم عالسكة</button>
+        </div>
+
+        <div class="start-row">
           <button id="run" class="btn btn-primary" type="button">ابدأ نقلتك</button>
-          <button id="voice" class="btn btn-voice" type="button">🎤 قول طلبك</button>
         </div>
 
         <div id="voiceStatus" class="voice-status">تقدر تكتب أو تتكلم باللهجة المصرية.</div>
@@ -457,8 +493,14 @@
         example: "مثال: عايز أنقل 20 كرتونة من سموحة للمنشية بكرة الساعة 3، وزنهم حوالي 250 كيلو.",
         placeholder: "اكتب طلب النقل هنا...",
         run: "ابدأ نقلتك",
-        voice: "🎤 قول طلبك",
-        stop: "⏹️ إيقاف وإرسال",
+        chat: "💬 شات",
+        voice: "🎤 فويس",
+        call: "📞 كلم عالسكة",
+        stop: "⏹️ إيقاف",
+        endCall: "⏹️ إنهاء المكالمة",
+        callListening: "📞 المكالمة شغالة... اتكلم بطبيعتك.",
+        callThinking: "عالسكة بيفهم طلبك...",
+        callReady: "المكالمة جاهزة. اتكلم تاني أو اضغط إنهاء المكالمة.",
         voiceIdle: "تقدر تكتب أو تتكلم باللهجة المصرية.",
         listening: "🎙️ سامعك... اتكلم بطبيعتك.",
         captured: "تمام، استلمنا طلبك وبنجهزه دلوقتي...",
@@ -509,8 +551,14 @@
         example: "Example: I need to move 20 boxes from Smouha to Mansheya tomorrow at 3 PM, around 250 kg.",
         placeholder: "Type your transport request here...",
         run: "Start Transport",
-        voice: "🎤 Speak Request",
-        stop: "⏹️ Stop & Send",
+        chat: "💬 Chat",
+        voice: "🎤 Voice",
+        call: "📞 Call 3ASEKKA",
+        stop: "⏹️ Stop",
+        endCall: "⏹️ End Call",
+        callListening: "📞 Call is live... speak naturally.",
+        callThinking: "3ASEKKA is understanding your request...",
+        callReady: "Call is ready. Speak again or end the call.",
         voiceIdle: "You can type or speak your request.",
         listening: "🎙️ Listening... speak naturally.",
         captured: "Got it. Preparing your request now...",
@@ -557,7 +605,9 @@
     const el = (id) => document.getElementById(id);
     const input = el("input");
     const run = el("run");
+    const chat = el("chat");
     const voice = el("voice");
+    const call = el("call");
     const voiceStatus = el("voiceStatus");
     const resultCard = el("resultCard");
     const summary = el("summary");
@@ -587,7 +637,9 @@
       el("example").textContent = t("example");
       input.placeholder = t("placeholder");
       run.textContent = t("run");
-      voice.textContent = listening ? t("stop") : t("voice");
+      chat.textContent = t("chat");
+      voice.textContent = listening && !callMode ? t("stop") : t("voice");
+      call.textContent = callMode ? t("endCall") : t("call");
       voiceStatus.textContent = t("voiceIdle");
       el("summaryTitle").textContent = t("summaryTitle");
       el("biddingTitle").textContent = t("biddingTitle");
@@ -596,6 +648,20 @@
       if (recognition) recognition.lang = uiLang === "ar" ? "ar-EG" : "en-US";
       if (lastData) render(lastData);
     }
+
+    function setMode(mode) {
+      chat.classList.toggle("active", mode === "chat");
+      voice.classList.toggle("active", mode === "voice");
+      call.classList.toggle("active", mode === "call");
+      input.focus();
+    }
+
+    chat.addEventListener("click", () => {
+      if (callMode) stopCallMode();
+      if (listening && recognition) recognition.stop();
+      setMode("chat");
+      voiceStatus.textContent = t("voiceIdle");
+    });
 
     langBtn.addEventListener("click", () => {
       uiLang = uiLang === "ar" ? "en" : "ar";
@@ -750,7 +816,7 @@
       resultCard.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
-    async function submitAgentRequest() {
+    async function submitAgentRequest(options = {}) {
       const text = input.value.trim();
       if (!text) {
         voiceStatus.textContent = t("empty");
@@ -776,7 +842,9 @@
           data = window.run3AsekkaBrowserFallback(text);
         }
         render(data);
-        voiceStatus.textContent = t("voiceIdle");
+        if (options.speakReply) await speakAgentReply(data);
+        voiceStatus.textContent = callMode ? t("callReady") : t("voiceIdle");
+        return data;
       } catch (error) {
         if (!hasServerApi) {
           serverAvailable = false;
@@ -794,7 +862,81 @@
       }
     }
 
-    run.addEventListener("click", submitAgentRequest);
+    run.addEventListener("click", () => submitAgentRequest());
+
+    let callMode = false;
+    let callRestartTimer = null;
+
+    function stopSpeech() {
+      try { window.speechSynthesis?.cancel(); } catch {}
+    }
+
+    function buildSpokenReply(data) {
+      if (data.status === "needs_information") {
+        return data.followUpQuestionAr || (uiLang === "ar"
+          ? "محتاج معلومة إضافية علشان أكمل طلب النقل."
+          : "I need one more detail to continue your transport request.");
+      }
+
+      const vehicle = data.recommendation?.vehicleNameAr || "";
+      const fare = data.pricing?.estimatedFare;
+      const offers = Array.isArray(data.offers) ? data.offers.length : 0;
+
+      if (uiLang === "ar") {
+        let parts = ["تمام، فهمت طلبك."];
+        if (vehicle) parts.push("العربية المناسبة " + vehicle + ".");
+        if (fare != null) parts.push("السعر التقديري " + fare + " جنيه.");
+        if (offers) parts.push("وصل " + offers + " عروض من السائقين.");
+        parts.push("تقدر تختار العرض المناسب.");
+        return parts.join(" ");
+      }
+
+      let parts = ["Got it. I understood your request."];
+      if (vehicle) parts.push("Suggested vehicle: " + vehicle + ".");
+      if (fare != null) parts.push("Estimated fare: " + fare + " EGP.");
+      if (offers) parts.push(offers + " driver offers are available.");
+      parts.push("You can choose the offer you prefer.");
+      return parts.join(" ");
+    }
+
+    function speakAgentReply(data) {
+      return new Promise((resolve) => {
+        if (!("speechSynthesis" in window)) return resolve();
+        stopSpeech();
+        const utterance = new SpeechSynthesisUtterance(buildSpokenReply(data));
+        utterance.lang = uiLang === "ar" ? "ar-EG" : "en-US";
+        utterance.rate = 1;
+        utterance.onend = resolve;
+        utterance.onerror = resolve;
+        window.speechSynthesis.speak(utterance);
+      });
+    }
+
+    function scheduleCallListening() {
+      if (!callMode || !recognition) return;
+      clearTimeout(callRestartTimer);
+      callRestartTimer = setTimeout(() => {
+        if (!callMode || listening) return;
+        try {
+          recognition.start();
+        } catch {
+          voiceStatus.textContent = t("micError");
+        }
+      }, 350);
+    }
+
+    function stopCallMode() {
+      callMode = false;
+      clearTimeout(callRestartTimer);
+      stopSpeech();
+      if (recognition && listening) {
+        try { recognition.stop(); } catch {}
+      }
+      call.classList.remove("calling");
+      call.textContent = t("call");
+      setMode("chat");
+      voiceStatus.textContent = t("voiceIdle");
+    }
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
@@ -802,8 +944,12 @@
 
     function setListening(active) {
       listening = active;
-      voice.classList.toggle("listening", active);
-      voice.textContent = active ? t("stop") : t("voice");
+      voice.classList.toggle("listening", active && !callMode);
+      voice.textContent = active && !callMode ? t("stop") : t("voice");
+      if (callMode) {
+        call.classList.toggle("calling", active);
+        call.textContent = t("endCall");
+      }
     }
 
     if (SpeechRecognition) {
@@ -820,7 +966,7 @@
         finalTranscript = "";
         capturedThisTurn = false;
         setListening(true);
-        voiceStatus.textContent = t("listening");
+        voiceStatus.textContent = callMode ? t("callListening") : t("listening");
       };
 
       recognition.onresult = (event) => {
@@ -845,21 +991,53 @@
       recognition.onend = async () => {
         const hadText = capturedThisTurn && input.value.trim().length > 0;
         setListening(false);
+
+        if (callMode) {
+          if (hadText) {
+            voiceStatus.textContent = t("callThinking");
+            await submitAgentRequest({ speakReply: true });
+          }
+          if (callMode) scheduleCallListening();
+          return;
+        }
+
         if (hadText) {
           voiceStatus.textContent = t("captured");
-          await submitAgentRequest();
+          setMode("voice");
         } else {
           voiceStatus.textContent = t("noSpeech");
         }
       };
 
       voice.addEventListener("click", () => {
+        if (callMode) stopCallMode();
+        setMode("voice");
         if (listening) return recognition.stop();
         try { recognition.start(); }
         catch { voiceStatus.textContent = t("micError"); }
       });
+
+      call.addEventListener("click", () => {
+        if (callMode) {
+          stopCallMode();
+          return;
+        }
+        callMode = true;
+        setMode("call");
+        call.classList.add("calling");
+        call.textContent = t("endCall");
+        voiceStatus.textContent = t("callListening");
+        stopSpeech();
+        if (listening) {
+          try { recognition.stop(); } catch {}
+          scheduleCallListening();
+        } else {
+          scheduleCallListening();
+        }
+      });
     } else {
       voice.disabled = true;
+      call.disabled = true;
       voiceStatus.textContent = t("micError");
     }
 
