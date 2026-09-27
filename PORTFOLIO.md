@@ -8,7 +8,7 @@
 
 **Best fit for:** AI agent work, workflow automation, logistics products, realtime mobile apps, Supabase systems, and operational MVPs.
 
-**Live demo:** https://3asekka.com/ai-agent/
+**Live demo:** https://3asekka.com/agent/
 
 **Contact:** https://github.com/SAMA10000
 
