@@ -67,6 +67,12 @@ The model is not allowed to invent business actions or pricing. The orchestratio
 
 The public demo returns an explicit action trace so reviewers can see the sequence.
 
+## Try it online
+
+**Live deployment:** https://3asekka.com/ai-agent/
+
+The deployed version runs the Node agent server-side and keeps Gemini credentials off the client.
+
 ## Run locally
 
 Requires Node.js 18+.
@@ -138,7 +144,7 @@ recording, run the Node server with an AI provider key locally or on a server-si
 
 The demo UI supports direct Egyptian Arabic voice requests in compatible Chromium browsers.
 
-- Press **🎤 اتكلمي وابعتِ الطلب**
+- Press **🎤 قول طلبك**
 - Browser speech recognition runs with `ar-EG`
 - The live transcript appears in the request box
 - When speaking ends, the request is automatically submitted to the transport agent
